@@ -36,7 +36,7 @@ export default function HeroLanding({
             Email
           </span>
           &nbsp;
-          {t("now")}
+          {t("Free")}
         </Link>
 
         <h1 className="text-balance font-satoshi text-[40px] font-black leading-[1.15] tracking-tight sm:text-5xl md:text-6xl md:leading-[1.15]">
