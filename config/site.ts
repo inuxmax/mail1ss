@@ -13,11 +13,11 @@ export const siteConfig: SiteConfig = {
   url: site_url,
   ogImage: `${site_url}/_static/og.jpg`,
   links: {
-    twitter: "https://twitter.com/yesmoree",
-    github: "https://github.com/oiov/Mail1s.net",
-    feedback: "https://github.com/oiov/Mail1s.net/issues",
-    discord: "https://discord.gg/AHPQYuZu3m",
-    oichat: "https://oi.Mail1s.net",
+    twitter: "https://Mail1s.net",
+    github: "https://Mail1s.net",
+    feedback: "https://Mail1s.net",
+    discord: "https://Mail1s.net",
+    oichat: "https://Mail1s.net",
   },
   mailSupport: support_email,
   emailR2Domain: email_r2_domain,
@@ -30,17 +30,7 @@ export const footerLinks: SidebarNavItem[] = [
       { title: "About", href: "/docs" },
       { title: "Terms", href: "/terms" },
       { title: "Privacy", href: "/privacy" },
-      { title: "Blog", href: "https://www.oiov.dev" },
       { title: "Feedback", href: siteConfig.links.feedback },
-    ],
-  },
-  {
-    title: "Products",
-    items: [
-      { title: "Vmail", href: "https://Mail1s.net" },
-      { title: "Moise", href: "https://moise.oiov.dev" },
-      { title: "Iconce", href: "https://iconce.com" },
-      { title: "OiChat", href: siteConfig.links.oichat },
     ],
   },
   {
@@ -48,7 +38,6 @@ export const footerLinks: SidebarNavItem[] = [
     items: [
       { title: "Introduction", href: "/docs" },
       { title: "Guide", href: "/docs/quick-start" },
-      { title: "Developer", href: "/docs/developer" },
       { title: "Contact", href: siteConfig.mailSupport },
     ],
   },
