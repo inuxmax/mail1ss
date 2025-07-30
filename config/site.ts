@@ -22,7 +22,6 @@ export const siteConfig: SiteConfig = {
   mailSupport: support_email,
   emailR2Domain: email_r2_domain,
 };
-
 export const footerLinks: SidebarNavItem[] = [
   {
     title: "Company",

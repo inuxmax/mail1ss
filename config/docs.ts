@@ -4,41 +4,6 @@ export const docsConfig: DocsConfig = {
   mainNav: [],
   sidebarNav: [
     {
-      title: "Getting Started",
-      items: [
-        {
-          title: "Introduction",
-          href: "/docs",
-          icon: "page",
-        },
-        {
-          title: "Quick Start",
-          href: "/docs/quick-start",
-          icon: "page",
-        },
-        {
-          title: "Short URLs",
-          href: "/docs/short-urls",
-          icon: "page",
-        },
-        {
-          title: "Emails",
-          href: "/docs/emails",
-          icon: "page",
-        },
-        {
-          title: "DNS Records",
-          href: "/docs/dns-records",
-          icon: "page",
-        },
-        {
-          title: "WRoom",
-          href: "/docs/wroom",
-          icon: "page",
-        },
-      ],
-    },
-    {
       title: "Open API",
       items: [
         {
