@@ -4,6 +4,26 @@ export const docsConfig: DocsConfig = {
   mainNav: [],
   sidebarNav: [
     {
+      title: "Getting Started",
+      items: [
+        {
+          title: "Short URLs",
+          href: "/docs/short-urls",
+          icon: "page",
+        },
+        {
+          title: "Emails",
+          href: "/docs/emails",
+          icon: "page",
+        },
+        {
+          title: "DNS Records",
+          href: "/docs/dns-records",
+          icon: "page",
+        },
+      ],
+    },
+    {
       title: "Open API",
       items: [
         {
