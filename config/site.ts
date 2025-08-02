@@ -17,7 +17,7 @@ export const siteConfig: SiteConfig = {
     github: "https://Mail1s.net",
     feedback: "https://Mail1s.net",
     discord: "https://Mail1s.net",
-    oichat: "https://oi.Mail1s.net",
+    oichat: "https://Mail1s.net",
   },
   mailSupport: support_email,
   emailR2Domain: email_r2_domain,
@@ -31,6 +31,15 @@ export const footerLinks: SidebarNavItem[] = [
       { title: "Privacy", href: "/privacy" },
       { title: "Blog", href: "https://Mail1s.net" },
       { title: "Feedback", href: siteConfig.links.feedback },
+    ],
+  },
+    {
+    title: "Products",
+    items: [
+      { title: "V1", href: "https://mail1s.net" },
+      { title: "V2", href: "https://mail1s.net" },
+      { title: "V3", href: "https://mail1s.net" },
+      { title: "V4", href: siteConfig.links.oichat },
     ],
   },
   {
