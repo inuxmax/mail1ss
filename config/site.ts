@@ -36,8 +36,8 @@ export const footerLinks: SidebarNavItem[] = [
     {
     title: "Products",
     items: [
-      { title: "V1", href: "https://mail1s.net" },
-      { title: "V2", href: "https://mail1s.net" },
+      { title: "Ftool.vn", href: "https://ftool.vn" },
+      { title: "Temp Gmail", href: "https://ftool.vn/temp-gmail" },
       { title: "V3", href: "https://mail1s.net" },
       { title: "V4", href: siteConfig.links.oichat },
     ],
@@ -46,7 +46,7 @@ export const footerLinks: SidebarNavItem[] = [
     title: "Docs",
     items: [
       { title: "Introduction", href: "/docs" },
-      { title: "Guide", href: "/docs/quick-start" },
+      { title: "Guide", href: "/docs/email" },
       { title: "Developer", href: "/docs" },
       { title: "Contact", href: siteConfig.mailSupport },
     ],
