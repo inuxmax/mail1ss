@@ -9,7 +9,7 @@ const app_name = env.NEXT_PUBLIC_APP_NAME || "Mail1s.net";
 export const siteConfig: SiteConfig = {
   name: app_name,
   description:
-    "Shorten links with analytics, manage emails and control subdomains—all on one platform.",
+    "Hệ Thống Tạo Temp-mail Free. domain edu.vn",
   url: site_url,
   ogImage: `${site_url}/_static/og.jpg`,
   links: {
