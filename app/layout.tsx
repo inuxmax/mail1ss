@@ -18,7 +18,12 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export const metadata = constructMetadata();
+export const metadata = {
+  ...constructMetadata(),
+  other: {
+    "google-adsense-account": "ca-pub-4443334856736382",
+  },
+};
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   const locale = await getLocale();
