@@ -556,8 +556,9 @@ export default function EmailSidebar({
             )}
           </div>
         ))}
-        {!isCollapsed && <GoogleAd />}
       </div>
+
+      {!isCollapsed && <GoogleAd />}
 
       {/* Pagination */}
       {!isCollapsed && data && totalPages > 1 && (
