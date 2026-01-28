@@ -558,19 +558,21 @@ export default function EmailSidebar({
         ))}
       </div>
 
-      {!isCollapsed && <GoogleAd />}
+      <div className="flex-none flex flex-col gap-1 border-t p-1">
+        {/* Pagination */}
+        {!isCollapsed && data && totalPages > 1 && (
+          <PaginationWrapper
+            className="m-0 scale-90"
+            total={data.total}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            pageSize={pageSize}
+            layout="center"
+          />
+        )}
 
-      {/* Pagination */}
-      {!isCollapsed && data && totalPages > 1 && (
-        <PaginationWrapper
-          className="m-0 scale-75"
-          total={data.total}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          pageSize={pageSize}
-          layout="center"
-        />
-      )}
+        {!isCollapsed && <GoogleAd />}
+      </div>
 
       {showSendsModal && (
         <Modal
