@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { ViewTransitions } from "next-view-transitions";
+import Script from "next/script";
 
 import { cn, constructMetadata } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -55,6 +56,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </NextIntlClientProvider>
           <GoogleAnalytics />
           <UmamiAnalytics />
+          <Script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4443334856736382"
+            crossOrigin="anonymous"
+          />
         </body>
       </html>
     </ViewTransitions>
