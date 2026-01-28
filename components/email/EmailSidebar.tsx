@@ -22,6 +22,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { CopyButton } from "../shared/copy-button";
 import { EmptyPlaceholder } from "../shared/empty-placeholder";
+import { GoogleAd } from "../shared/google-ad";
 import { Icons } from "../shared/icons";
 import { PaginationWrapper } from "../shared/pagination";
 import { TimeAgoIntl } from "../shared/time-ago";
@@ -555,6 +556,7 @@ export default function EmailSidebar({
             )}
           </div>
         ))}
+        {!isCollapsed && <GoogleAd />}
       </div>
 
       {/* Pagination */}
@@ -721,10 +723,9 @@ export default function EmailSidebar({
                 disabled={
                   isPending ||
                   deleteInput !==
-                    `delete ${
-                      userEmails.find((e) => e.id === emailToDelete)
-                        ?.emailAddress
-                    }`
+                  `delete ${userEmails.find((e) => e.id === emailToDelete)
+                    ?.emailAddress
+                  }`
                 }
               >
                 {t("Confirm Delete")}
