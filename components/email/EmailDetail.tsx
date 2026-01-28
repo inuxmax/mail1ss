@@ -18,6 +18,7 @@ import { cn, downloadFile, formatDate, formatFileSize } from "@/lib/utils";
 import { Icons } from "@/components/shared/icons";
 
 import { BlurImg } from "../shared/blur-image";
+import { GoogleAd } from "../shared/google-ad";
 import { Button } from "../ui/button";
 import { Modal } from "../ui/modal";
 import {
@@ -281,6 +282,7 @@ export default function EmailDetail({
             </div>
           </div>
         )}
+        <GoogleAd slot="8709605665" />
       </div>
 
       {/* 图片预览 Modal */}

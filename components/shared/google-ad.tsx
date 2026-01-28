@@ -2,7 +2,11 @@
 
 import { useEffect } from "react";
 
-export function GoogleAd() {
+interface GoogleAdProps {
+    slot?: string;
+}
+
+export function GoogleAd({ slot = "4698208465" }: GoogleAdProps) {
     useEffect(() => {
         try {
             // @ts-ignore
@@ -19,7 +23,7 @@ export function GoogleAd() {
                 className="adsbygoogle"
                 style={{ display: "block" }}
                 data-ad-client="ca-pub-4443334856736382"
-                data-ad-slot="4698208465"
+                data-ad-slot={slot}
                 data-ad-format="auto"
                 data-full-width-responsive="true"
             />
