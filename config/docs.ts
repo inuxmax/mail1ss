@@ -11,6 +11,11 @@ export const docsConfig: DocsConfig = {
           href: "/docs/emails",
           icon: "page",
         },
+        {
+          title: "Temp Gmails",
+          href: "/docs/gmail",
+          icon: "page",
+        },
       ],
     },
   ],

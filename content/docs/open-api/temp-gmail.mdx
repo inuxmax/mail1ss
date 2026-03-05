@@ -1,0 +1,103 @@
+---
+title: Temp Gmail API
+description: An API to generate temporary Gmail addresses.
+---
+
+## Temp Gmail API
+
+The Temp Gmail API allows you to programmatically generate temporary Gmail aliases. This is useful for testing, privacy, or creating disposable email addresses.
+
+### Endpoint
+
+`POST https://Mail1s.net/api/v1/temp-gmail`
+
+### Headers
+
+| Header | Value | Description |
+| --- | --- | --- |
+| `Content-Type` | `application/json` | The content type of the request body. |
+| `wrdo-api-key` | `YOUR_API_KEY` | Your API key. You can get it from the [Dashboard/Settings](/dashboard/settings). |
+
+### Request Body
+
+This endpoint does not require a request body. It automatically selects an available backend Gmail account and generates a unique alias.
+
+### Response
+
+The API returns a JSON object containing the details of the created temporary email.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | The unique identifier of the temporary email. |
+| `tempEmailAddress` | `string` | The generated temporary email address. |
+| `createdAt` | `string` | The timestamp when the email was created. |
+| `expiresAt` | `string` | The timestamp when the email will expire (if applicable). |
+
+### Example
+
+<CodeBlock>
+
+```bash
+curl -X POST https://Mail1s.net/api/v1/temp-gmail \
+  -H "Content-Type: application/json" \
+  -H "wrdo-api-key: YOUR_API_KEY"
+```
+
+```javascript
+const response = await fetch("https://Mail1s.net/api/v1/temp-gmail", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "wrdo-api-key": "YOUR_API_KEY",
+  },
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeBlock>
+
+### Successful Response Example
+
+```json
+{
+  "id": "cm7...xyz",
+  "tempEmailAddress": "h.e.l.l.o.w.o.r.l.d@gmail.com",
+  "createdAt": "2024-03-06T10:00:00.000Z",
+  "expiresAt": null
+}
+```
+
+### Error Responses
+
+- **401 Unauthorized**: Missing or invalid API key.
+- **403 Forbidden**: User account is inactive or plan limit reached.
+- **503 Service Unavailable**: No active backend Gmail accounts available.
+- **500 Internal Server Error**: An unexpected error occurred.
+
+## Get Temp Gmail List
+
+You can also retrieve a list of your created temporary Gmails.
+
+### Endpoint
+
+`GET https://Mail1s.net/api/v1/temp-gmail`
+
+### Query Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `page` | `number` | Page number (default: 1) |
+| `limit` | `number` | Items per page (default: 10) |
+
+### Example
+
+<CodeBlock>
+
+```bash
+curl -X GET "https://Mail1s.net/api/v1/temp-gmail?page=1&limit=10" \
+  -H "wrdo-api-key: YOUR_API_KEY"
+```
+
+</CodeBlock>

@@ -1,0 +1,83 @@
+---
+title: Temp Gmails
+description: Create and manage your temporary Gmail addresses.
+---
+
+<Callout type="warning" twClass="mt-0">
+  Please do not abuse the temp gmail service. If any illegal or malicious activities are discovered, the account will be banned. If you need help, please contact us.
+</Callout>
+
+## Overview
+
+The Temp Gmail service allows you to generate temporary Gmail aliases using the "dot trick". This is useful for testing, privacy, or creating disposable email addresses.
+
+The Temp Gmail API allows you to programmatically generate temporary Gmail aliases.
+
+### Create Temp Gmail
+
+The `POST /api/v1/temp-gmail` endpoint allows you to create a new temporary Gmail address.
+
+```bash
+curl -X POST https://Mail1s.net/api/v1/temp-gmail \
+  -H "Content-Type: application/json" \
+  -H "wrdo-api-key: YOUR_API_KEY"
+```
+
+#### Request Body
+
+This endpoint does not require a request body. It automatically selects an available backend Gmail account and generates a unique alias.
+
+#### Response
+
+On success (Status 201):
+```json
+{
+  "id": "cm7...xyz",
+  "tempEmailAddress": "h.e.l.l.o.w.o.r.l.d@gmail.com",
+  "createdAt": "2024-03-06T10:00:00.000Z",
+  "expiresAt": null
+}
+```
+
+#### Error Responses
+
+- `401 Unauthorized`: Missing or invalid API key
+- `403 Forbidden`: User account is inactive or plan limit reached
+- `503 Service Unavailable`: No active backend Gmail accounts available
+- `500 Internal Server Error`: Server error
+
+### Get Temp Gmail List
+
+The `GET /api/v1/temp-gmail` endpoint allows you to retrieve a list of your created temporary Gmails.
+
+```bash
+curl -X GET "https://Mail1s.net/api/v1/temp-gmail?page=1&limit=10" \
+  -H "wrdo-api-key: YOUR_API_KEY"
+```
+
+#### Query Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `page` | `number` | Page number (default: 1) |
+| `limit` | `number` | Items per page (default: 10) |
+
+#### Response
+
+On success (Status 200):
+```json
+{
+  "items": [
+    {
+      "id": "cm7...xyz",
+      "tempEmailAddress": "h.e.l.l.o.w.o.r.l.d@gmail.com",
+      "createdAt": "2024-03-06T10:00:00.000Z",
+      "expiresAt": null
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 10,
+  "totalPages": 1
+}
+```
