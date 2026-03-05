@@ -43,11 +43,16 @@ export interface DomainListProps {
   action: string;
 }
 
+type DomainRow = DomainFormData & { pro_email_only?: boolean };
+
 function TableColumnSekleton() {
   return (
-    <TableRow className="grid grid-cols-4 items-center sm:grid-cols-7">
+    <TableRow className="grid grid-cols-4 items-center sm:grid-cols-8">
       <TableCell className="col-span-1 flex">
         <Skeleton className="h-5 w-20" />
+      </TableCell>
+      <TableCell className="col-span-1 hidden sm:flex">
+        <Skeleton className="h-5 w-16" />
       </TableCell>
       <TableCell className="col-span-1 hidden sm:flex">
         <Skeleton className="h-5 w-16" />
@@ -91,7 +96,7 @@ export default function DomainList({ user, action }: DomainListProps) {
   const { mutate } = useSWRConfig();
   const { data, isLoading } = useSWR<{
     total: number;
-    list: DomainFormData[];
+    list: DomainRow[];
   }>(
     `${action}?page=${currentPage}&size=${pageSize}&target=${searchParams.target}`,
     fetcher,
@@ -107,7 +112,7 @@ export default function DomainList({ user, action }: DomainListProps) {
   const handleChangeStatus = async (
     checked: boolean,
     target: string,
-    domain: DomainFormData,
+    domain: DomainRow,
   ) => {
     const res = await fetch(action, {
       method: "PUT",
@@ -118,6 +123,8 @@ export default function DomainList({ user, action }: DomainListProps) {
         enable_email: target === "enable_email" ? checked : domain.enable_email,
         enable_dns: target === "enable_dns" ? checked : domain.enable_dns,
         active: target === "active" ? checked : domain.active,
+        pro_email_only:
+          target === "pro_email_only" ? checked : !!domain.pro_email_only,
       }),
     });
     if (res.ok) {
@@ -221,7 +228,7 @@ export default function DomainList({ user, action }: DomainListProps) {
 
           <Table>
             <TableHeader className="bg-gray-100/50 dark:bg-primary-foreground">
-              <TableRow className="grid grid-cols-4 items-center text-xs sm:grid-cols-7">
+              <TableRow className="grid grid-cols-4 items-center text-xs sm:grid-cols-8">
                 <TableHead className="col-span-1 flex items-center font-bold">
                   {t("Domain Name")}
                 </TableHead>
@@ -233,6 +240,9 @@ export default function DomainList({ user, action }: DomainListProps) {
                 </TableHead>
                 <TableHead className="col-span-1 hidden items-center text-nowrap font-bold sm:flex">
                   {t("Subdomain Service")}
+                </TableHead>
+                <TableHead className="col-span-1 hidden items-center text-nowrap font-bold sm:flex">
+                  PRO
                 </TableHead>
                 <TableHead className="col-span-1 flex items-center text-nowrap font-bold">
                   {t("Active")}
@@ -257,7 +267,7 @@ export default function DomainList({ user, action }: DomainListProps) {
               ) : data && data.list && data.list.length ? (
                 data.list.map((domain) => (
                   <div className="border-b" key={domain.id}>
-                    <TableRow className="grid grid-cols-4 items-center sm:grid-cols-7">
+                    <TableRow className="grid grid-cols-4 items-center sm:grid-cols-8">
                       <TableCell className="col-span-1 flex items-center gap-1">
                         <Link
                           className="overflow-hidden text-ellipsis whitespace-normal text-slate-600 hover:text-blue-400 hover:underline dark:text-slate-400"
@@ -304,6 +314,14 @@ export default function DomainList({ user, action }: DomainListProps) {
                           domain.cf_email && (
                             <Icons.cloudflare className="mx-0.5 size-4" />
                           )}
+                      </TableCell>
+                      <TableCell className="col-span-1 hidden items-center gap-1 sm:flex">
+                        <Switch
+                          defaultChecked={!!domain.pro_email_only}
+                          onCheckedChange={(value) =>
+                            handleChangeStatus(value, "pro_email_only", domain)
+                          }
+                        />
                       </TableCell>
                       <TableCell className="col-span-1 flex items-center gap-1">
                         <Switch

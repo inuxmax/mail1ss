@@ -10,43 +10,9 @@ export const sidebarLinks: SidebarNavItem[] = [
     items: [
       { href: "/dashboard", icon: "dashboard", title: "Dashboard" },
       { href: "/dashboard/urls", icon: "link", title: "Short Urls" },
-      { href: "/dashboard/records", icon: "globe", title: "DNS Records" },
       { href: "/emails", icon: "mail", title: "Emails" },
-      {
-        href: "/dashboard/storage",
-        icon: "storage",
-        title: "Cloud Storage",
-      },
-    ],
-  },
-  {
-    title: "OPEN API",
-    items: [
-      {
-        href: "/dashboard/scrape",
-        icon: "bug",
-        title: "Overview",
-      },
-      {
-        href: "/dashboard/scrape/screenshot",
-        icon: "camera",
-        title: "Screenshot",
-      },
-      {
-        href: "/dashboard/scrape/qrcode",
-        icon: "qrcode",
-        title: "QR Code",
-      },
-      {
-        href: "/dashboard/scrape/meta-info",
-        icon: "globe",
-        title: "Meta Info",
-      },
-      {
-        href: "/dashboard/scrape/markdown",
-        icon: "fileText",
-        title: "Markdown",
-      },
+      { href: "/temp-gmail", icon: "mail", title: "Temp Gmail" },
+      { href: "/dashboard/upgrade", icon: "crown", title: "Upgrade" },
     ],
   },
   {

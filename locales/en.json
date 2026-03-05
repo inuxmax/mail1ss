@@ -456,6 +456,8 @@
     "Dashboard": "Dashboard",
     "Short Urls": "Short Urls",
     "Emails": "Emails",
+    "Upgrade": "Upgrade",
+    "Current Plan": "Current Plan",
     "DNS Records": "DNS Records",
     "WRoom": "WRoom",
     "OPEN API": "OPEN API",
@@ -485,6 +487,7 @@
     "Log out": "Log out",
     "System Settings": "System Settings",
     "Cloud Storage": "Cloud Storage",
+    "Temp Gmail": "Temp Gmail",
     "Cloud Storage Manage": "Cloud Storage"
   },
   "Email": {

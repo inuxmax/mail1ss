@@ -71,6 +71,8 @@ model User {
   UserEmail     UserEmail[]
   UserSendEmail UserSendEmail[]
   UserFile      UserFile[]
+  Transaction   Transaction[]
+  UserTempGmail UserTempGmail[]
 
   @@index([createdAt])
   @@map(name: "users")
@@ -312,6 +314,9 @@ model Plan {
   emEmailAddresses Int
   emDomains        Int
   emSendEmails     Int
+  
+  // Temp Gmail quotas
+  tempGmailLimit   Int @default(0)
 
   // Storage (ST) related settings
   stMaxFileSize  String @default("26214400")
@@ -324,10 +329,31 @@ model Plan {
 
   // Metadata
   isActive  Boolean  @default(true)
+  price     Decimal  @default(0) @db.Decimal(10, 2)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
+  transactions Transaction[]
+
   @@map("plans")
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  planId      String
+  amount      Decimal  @db.Decimal(10, 2)
+  currency    String   @default("USDT")
+  status      String   // waiting, completed, expired, failed
+  transId     String?  @unique // From payment gateway
+  requestId   String   @unique // Internal request ID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@map("transactions")
 }
 
 model UserFile {
@@ -358,4 +384,55 @@ model UserFile {
 
   @@index([userId, providerName, status, lastModified, createdAt])
   @@map(name: "user_files")
+}
+
+model GmailAccount {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  refreshToken String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userTempGmail UserTempGmail[]
+
+  @@map("gmail_accounts")
+}
+
+model UserTempGmail {
+  id               String    @id @default(uuid())
+  userId           String
+  gmailAccountId   String
+  tempEmailAddress String    @unique
+  createdAt        DateTime  @default(now())
+  expiresAt        DateTime?
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gmailAccount GmailAccount @relation(fields: [gmailAccountId], references: [id], onDelete: Cascade)
+  messages     TempGmailMessage[]
+
+  @@map("user_temp_gmails")
+}
+
+model TempGmailMessage {
+  id           String        @id @default(uuid())
+  tempGmailId  String
+  gmailId      String        @unique // Original Gmail Message ID
+  threadId     String
+  snippet      String?
+  subject      String?
+  from         String?
+  to           String?
+  date         DateTime?
+  internalDate String?       // Timestamp from Gmail
+  labelIds     String[]
+  isRead       Boolean       @default(false)
+  html         String?       @db.Text
+  text         String?       @db.Text
+  createdAt    DateTime      @default(now())
+  
+  tempGmail    UserTempGmail @relation(fields: [tempGmailId], references: [id], onDelete: Cascade)
+  
+  @@index([tempGmailId])
+  @@map("temp_gmail_messages")
 }

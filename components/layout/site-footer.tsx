@@ -6,8 +6,7 @@ import { footerLinks, siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 
-// import { NewsletterForm } from "../forms/newsletter-form";
-import GitHubStarsWithSuspense from "../shared/github-star-wrapper";
+import { NewsletterForm } from "../forms/newsletter-form";
 import { Icons } from "../shared/icons";
 
 export function SiteFooter({ className }: React.HTMLAttributes<HTMLElement>) {
@@ -32,7 +31,6 @@ export function SiteFooter({ className }: React.HTMLAttributes<HTMLElement>) {
             <br />
             —all on one platform.
           </div>
-          <GitHubStarsWithSuspense className="mt-4" owner="oiov" repo="Mail1s.net" />
         </div>
         {footerLinks.map((section) => (
           <div key={section.title}>

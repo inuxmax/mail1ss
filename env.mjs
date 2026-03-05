@@ -17,6 +17,8 @@ export const env = createEnv({
     RESEND_FROM_EMAIL: z.string().optional(),
     SCREENSHOTONE_BASE_URL: z.string().optional(),
     GITHUB_TOKEN: z.string().optional(),
+    FPAYMENT_MERCHANT_ID: z.string().optional(),
+    FPAYMENT_API_KEY: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().optional(),
@@ -43,5 +45,7 @@ export const env = createEnv({
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
     LinuxDo_CLIENT_ID: process.env.LinuxDo_CLIENT_ID,
     LinuxDo_CLIENT_SECRET: process.env.LinuxDo_CLIENT_SECRET,
+    FPAYMENT_MERCHANT_ID: process.env.FPAYMENT_MERCHANT_ID,
+    FPAYMENT_API_KEY: process.env.FPAYMENT_API_KEY,
   },
 });

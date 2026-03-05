@@ -4,8 +4,11 @@ import { checkApiKey } from "@/lib/dto/api-key";
 import { getDomainsByFeature } from "@/lib/dto/domains";
 import { createUserEmail, deleteUserEmailByAddress } from "@/lib/dto/email";
 import { getPlanQuota } from "@/lib/dto/plan";
+import { getMultipleConfigs } from "@/lib/dto/system-config";
 import { reservedAddressSuffix } from "@/lib/enums";
 import { restrictByTimeRange } from "@/lib/team";
+
+const EMAIL_PRO_DOMAINS_KEY = "email_pro_domains";
 
 // 创建新 UserEmail
 export async function POST(req: NextRequest) {
@@ -51,11 +54,18 @@ export async function POST(req: NextRequest) {
 
   const [prefix, suffix] = emailAddress.split("@");
   const zones = await getDomainsByFeature("enable_email", true);
-  if (
-    !zones.length ||
-    !zones.map((zone) => zone.domain_name).includes(suffix)
-  ) {
+  const availableDomains = zones.map((zone) => zone.domain_name);
+  if (!zones.length || !availableDomains.includes(suffix)) {
     return NextResponse.json("Invalid email suffix address", { status: 400 });
+  }
+  const configs = await getMultipleConfigs([EMAIL_PRO_DOMAINS_KEY]);
+  const proDomains = Array.isArray(configs[EMAIL_PRO_DOMAINS_KEY])
+    ? configs[EMAIL_PRO_DOMAINS_KEY]
+    : [];
+  if ((user.team || "").toLowerCase() === "free" && proDomains.includes(suffix)) {
+    return NextResponse.json("This domain is for PRO plan only", {
+      status: 403,
+    });
   }
 
   const limit_len =

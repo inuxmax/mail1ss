@@ -12,12 +12,14 @@ export interface PlanQuota {
   emEmailAddresses: number;
   emDomains: number;
   emSendEmails: number;
+  tempGmailLimit: number;
   stMaxFileSize: string;
   stMaxTotalSize: string;
   stMaxFileCount: number;
   appSupport: string;
   appApiAccess: boolean;
   isActive: boolean;
+  price: number;
 }
 
 export interface PlanQuotaFormData extends PlanQuota {
@@ -45,12 +47,14 @@ export async function getPlanQuota(planName: string) {
       emEmailAddresses: 0,
       emDomains: 0,
       emSendEmails: 0,
+      tempGmailLimit: 0,
       stMaxFileSize: "26214400",
       stMaxTotalSize: "524288000",
       stMaxFileCount: 1000,
       appSupport: "BASIC",
       appApiAccess: true,
       isActive: true,
+      price: 0,
     };
   }
 
@@ -66,12 +70,14 @@ export async function getPlanQuota(planName: string) {
     emEmailAddresses: plan.emEmailAddresses,
     emDomains: plan.emDomains,
     emSendEmails: plan.emSendEmails,
+    tempGmailLimit: plan.tempGmailLimit || 0,
     stMaxFileSize: plan.stMaxFileSize,
     stMaxTotalSize: plan.stMaxTotalSize,
     stMaxFileCount: plan.stMaxFileCount,
     appSupport: plan.appSupport.toLowerCase(),
     appApiAccess: plan.appApiAccess,
     isActive: plan.isActive,
+    price: Number(plan.price),
   };
 }
 
@@ -130,12 +136,14 @@ export async function updatePlanQuota(plan: PlanQuotaFormData) {
       emEmailAddresses: plan.emEmailAddresses,
       emDomains: plan.emDomains,
       emSendEmails: plan.emSendEmails,
+      tempGmailLimit: plan.tempGmailLimit,
       stMaxFileSize: plan.stMaxFileSize,
       stMaxTotalSize: plan.stMaxTotalSize,
       stMaxFileCount: plan.stMaxFileCount,
       appSupport: plan.appSupport.toUpperCase() as any,
       appApiAccess: plan.appApiAccess,
       isActive: plan.isActive,
+      price: plan.price,
       updatedAt: new Date(),
     },
   });
@@ -156,12 +164,14 @@ export async function createPlan(plan: PlanQuota) {
       emEmailAddresses: plan.emEmailAddresses,
       emDomains: plan.emDomains,
       emSendEmails: plan.emSendEmails,
+      tempGmailLimit: plan.tempGmailLimit,
       stMaxFileSize: plan.stMaxFileSize,
       stMaxTotalSize: plan.stMaxTotalSize,
       stMaxFileCount: plan.stMaxFileCount,
       appSupport: plan.appSupport.toUpperCase() as any,
       appApiAccess: plan.appApiAccess,
       isActive: true,
+      price: plan.price,
     },
   });
 }

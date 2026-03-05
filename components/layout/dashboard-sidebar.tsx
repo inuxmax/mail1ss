@@ -26,11 +26,18 @@ import { Icons } from "@/components/shared/icons";
 
 interface DashboardSidebarProps {
   links: SidebarNavItem[];
+  currentPlan?: string | null;
 }
 
-export function DashboardSidebar({ links }: DashboardSidebarProps) {
+export function DashboardSidebar({ links, currentPlan }: DashboardSidebarProps) {
   const t = useTranslations("System");
   const path = usePathname();
+  const upgradePath = "/dashboard/upgrade";
+  const regularLinks = links.map((section) => ({
+    ...section,
+    items: section.items.filter((item) => item.href !== upgradePath),
+  }));
+  const normalizedPlan = (currentPlan || "free").replaceAll("_", " ");
 
   const { isTablet } = useMediaQuery();
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(!isTablet);
@@ -91,7 +98,7 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
               </div>
 
               <nav className="flex flex-1 flex-col gap-8 px-4 pt-4">
-                {links.map(
+                {regularLinks.map(
                   (section) =>
                     section.items.length > 0 && (
                       <section
@@ -165,30 +172,72 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
                 )}
               </nav>
 
-              {isSidebarExpanded && (
-                <div
-                  className="mx-3 mt-auto flex items-center gap-1 pb-3 pt-6 text-xs text-muted-foreground/90"
-                  style={{ fontFamily: "Bahamas Bold" }}
-                >
-                  Copyright {new Date().getFullYear()} &copy;
+              <div className={cn("mt-auto px-3 pb-3", !isSidebarExpanded && "pb-4")}>
+                {isSidebarExpanded ? (
                   <Link
-                    href={siteConfig.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-medium underline-offset-2 hover:underline"
+                    href={upgradePath}
+                    className={cn(
+                      "block rounded-xl border p-3 shadow-sm transition-all",
+                      "border-amber-400/40 bg-gradient-to-r from-amber-400/20 via-yellow-300/20 to-orange-400/20 hover:shadow-md",
+                      path === upgradePath && "ring-2 ring-amber-400/60",
+                    )}
                   >
-                    {siteConfig.name}
+                    <div className="flex items-center gap-2">
+                      <Icons.crown className="size-5 text-amber-600" />
+                      <span className="text-sm font-semibold">{t("Upgrade")}</span>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t("Current Plan")}:{" "}
+                      <span className="font-semibold uppercase text-foreground">
+                        {normalizedPlan}
+                      </span>
+                    </p>
                   </Link>
-                  <Link
-                    href={`${siteConfig.links.github}/releases/latest`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-thin underline-offset-2 hover:underline"
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        href={upgradePath}
+                        className={cn(
+                          "flex h-10 items-center justify-center rounded-lg border",
+                          "border-amber-400/40 bg-gradient-to-r from-amber-400/20 via-yellow-300/20 to-orange-400/20",
+                          path === upgradePath && "ring-2 ring-amber-400/60",
+                        )}
+                      >
+                        <Icons.crown className="size-5 text-amber-600" />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      {t("Upgrade")} · {t("Current Plan")}: {normalizedPlan}
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+
+                {isSidebarExpanded && (
+                  <div
+                    className="mx-1 flex items-center gap-1 pb-1 pt-4 text-xs text-muted-foreground/90"
+                    style={{ fontFamily: "Bahamas Bold" }}
                   >
-                    v{pkg.version}
-                  </Link>
-                </div>
-              )}
+                    Copyright {new Date().getFullYear()} &copy;
+                    <Link
+                      href={siteConfig.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium underline-offset-2 hover:underline"
+                    >
+                      {siteConfig.name}
+                    </Link>
+                    <Link
+                      href={`${siteConfig.links.github}/releases/latest`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-thin underline-offset-2 hover:underline"
+                    >
+                      v{pkg.version}
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </aside>
         </ScrollArea>
@@ -197,11 +246,17 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
   );
 }
 
-export function MobileSheetSidebar({ links }: DashboardSidebarProps) {
+export function MobileSheetSidebar({ links, currentPlan }: DashboardSidebarProps) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const { isSm, isMobile } = useMediaQuery();
   const t = useTranslations("System");
+  const upgradePath = "/dashboard/upgrade";
+  const regularLinks = links.map((section) => ({
+    ...section,
+    items: section.items.filter((item) => item.href !== upgradePath),
+  }));
+  const normalizedPlan = (currentPlan || "free").replaceAll("_", " ");
 
   if (isSm || isMobile) {
     return (
@@ -234,7 +289,7 @@ export function MobileSheetSidebar({ links }: DashboardSidebarProps) {
                   </span>
                 </Link>
 
-                {links.map(
+                {regularLinks.map(
                   (section) =>
                     section.items.length > 0 && (
                       <section
@@ -281,32 +336,51 @@ export function MobileSheetSidebar({ links }: DashboardSidebarProps) {
                     ),
                 )}
 
-                <div
-                  className="mx-3 mt-auto flex items-center gap-1 pb-3 pt-6 font-mono text-xs text-muted-foreground/90"
-                  style={{ fontFamily: "Bahamas Bold" }}
-                >
-                  Copyright {new Date().getFullYear()} &copy;
+                <div className="mt-auto space-y-3">
                   <Link
-                    href={siteConfig.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-medium underline-offset-2 hover:underline"
+                    href={upgradePath}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "mx-2 block rounded-xl border p-3 shadow-sm transition-all",
+                      "border-amber-400/40 bg-gradient-to-r from-amber-400/20 via-yellow-300/20 to-orange-400/20 hover:shadow-md",
+                      path === upgradePath && "ring-2 ring-amber-400/60",
+                    )}
                   >
-                    {siteConfig.name}
+                    <div className="flex items-center gap-2">
+                      <Icons.crown className="size-5 text-amber-600" />
+                      <span className="text-sm font-semibold">{t("Upgrade")}</span>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t("Current Plan")}:{" "}
+                      <span className="font-semibold uppercase text-foreground">
+                        {normalizedPlan}
+                      </span>
+                    </p>
                   </Link>
-                  <Link
-                    href={`${siteConfig.links.github}/releases/latest`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-thin underline-offset-2 hover:underline"
-                  >
-                    v{pkg.version}
-                  </Link>
-                </div>
 
-                {/* <div className="mt-auto">
-                  <UpgradeCard />
-                </div> */}
+                  <div
+                    className="mx-3 flex items-center gap-1 pb-3 pt-2 font-mono text-xs text-muted-foreground/90"
+                    style={{ fontFamily: "Bahamas Bold" }}
+                  >
+                    Copyright {new Date().getFullYear()} &copy;
+                    <Link
+                      href={siteConfig.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium underline-offset-2 hover:underline"
+                    >
+                      {siteConfig.name}
+                    </Link>
+                    <Link
+                      href={`${siteConfig.links.github}/releases/latest`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-thin underline-offset-2 hover:underline"
+                    >
+                      v{pkg.version}
+                    </Link>
+                  </div>
+                </div>
               </nav>
             </div>
           </ScrollArea>

@@ -108,7 +108,7 @@ export default function EmailSidebar({
   );
 
   const { data: emailDomains, isLoading: isLoadingDomains } = useSWR<
-    { domain_name: string; min_email_length: number }[]
+    { domain_name: string; min_email_length: number; isPro?: boolean }[]
   >("/api/domain?feature=email", fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 10000,
@@ -116,7 +116,10 @@ export default function EmailSidebar({
 
   useEffect(() => {
     if (!domainSuffix && emailDomains && emailDomains.length > 0) {
-      setDomainSuffix(emailDomains[0].domain_name);
+      const firstAvailableDomain =
+        emailDomains.find((d) => !d.isPro)?.domain_name ||
+        emailDomains[0].domain_name;
+      setDomainSuffix(firstAvailableDomain);
     }
   }, [domainSuffix, emailDomains]);
 
@@ -128,9 +131,11 @@ export default function EmailSidebar({
   const totalPages = data ? Math.ceil(data.total / pageSize) : 0;
 
   const handleSubmitEmail = async (emailSuffix: string) => {
+    const selectedDomain = emailDomains?.find(
+      (d) => d.domain_name === domainSuffix,
+    );
     const limit_len =
-      emailDomains?.find((d) => d.domain_name === domainSuffix)
-        ?.min_email_length ?? 1;
+      selectedDomain?.min_email_length ?? 1;
     if (!emailSuffix || emailSuffix.length < limit_len) {
       toast.error(`Email address characters must be at least ${limit_len}`);
       return;
@@ -141,6 +146,10 @@ export default function EmailSidebar({
     }
     if (!domainSuffix) {
       toast.error("Domain suffix cannot be empty");
+      return;
+    }
+    if (selectedDomain?.isPro) {
+      toast.error("This domain is for PRO plan only");
       return;
     }
     if (reservedAddressSuffix.includes(emailSuffix)) {
@@ -637,8 +646,21 @@ export default function EmailSidebar({
                             <SelectItem
                               key={v.domain_name}
                               value={v.domain_name}
+                              textValue={`@${v.domain_name}`}
+                              disabled={Boolean(v.isPro)}
                             >
-                              @{v.domain_name}
+                              <div className="flex w-full items-center justify-between gap-2">
+                                <span>@{v.domain_name}</span>
+                                {v.isPro && (
+                                  <Badge
+                                    variant="outline"
+                                    className="ml-2 border-emerald-500/30 bg-emerald-500/10 px-2 py-0 text-[10px] font-semibold text-emerald-600"
+                                  >
+                                    <Icons.crown className="mr-1 size-3" />
+                                    PRO
+                                  </Badge>
+                                )}
+                              </div>
                             </SelectItem>
                           ))
                         ) : (

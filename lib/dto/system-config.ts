@@ -162,15 +162,28 @@ export async function setSystemConfig(
   description?: string,
 ) {
   const serializedValue = serializeConfigValue(value, type);
-
-  return await prisma.systemConfig.upsert({
+  const existingConfig = await prisma.systemConfig.findFirst({
     where: { key },
-    update: {
-      value: serializedValue,
-      type,
-      description,
-    },
-    create: {
+    select: { key: true },
+  });
+
+  if (existingConfig) {
+    await prisma.systemConfig.updateMany({
+      where: { key },
+      data: {
+        value: serializedValue,
+        type,
+        description,
+      },
+    });
+
+    return await prisma.systemConfig.findFirst({
+      where: { key },
+    });
+  }
+
+  return await prisma.systemConfig.create({
+    data: {
       key,
       value: serializedValue,
       type,

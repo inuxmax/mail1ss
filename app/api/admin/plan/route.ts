@@ -52,13 +52,15 @@ export async function POST(req: NextRequest) {
       rcNewRecords: plan.rcNewRecords,
       emEmailAddresses: plan.emEmailAddresses,
       emDomains: plan.emDomains,
+      emSendEmails: plan.emSendEmails,
+      tempGmailLimit: plan.tempGmailLimit,
       stMaxFileSize: plan.stMaxFileSize,
       stMaxTotalSize: plan.stMaxTotalSize,
       stMaxFileCount: plan.stMaxFileCount,
-      emSendEmails: plan.emSendEmails,
       appSupport: plan.appSupport.toUpperCase() as any,
       appApiAccess: plan.appApiAccess,
       isActive: true,
+      price: Number(plan.price || 0),
     });
 
     if (data) {
@@ -98,12 +100,14 @@ export async function PUT(req: NextRequest) {
       emEmailAddresses: plan.emEmailAddresses,
       emDomains: plan.emDomains,
       emSendEmails: plan.emSendEmails,
+      tempGmailLimit: plan.tempGmailLimit,
       stMaxFileSize: plan.stMaxFileSize,
       stMaxTotalSize: plan.stMaxTotalSize,
       stMaxFileCount: plan.stMaxFileCount,
       appSupport: plan.appSupport.toUpperCase() as any,
       appApiAccess: plan.appApiAccess,
       isActive: plan.isActive,
+      price: Number(plan.price || 0),
     });
 
     if (res) {

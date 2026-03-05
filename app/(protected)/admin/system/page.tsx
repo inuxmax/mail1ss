@@ -6,6 +6,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 
 import AppConfigs from "./app-configs";
 import DomainList from "./domain-list";
+import GmailList from "./gmail-list";
 import PlanList from "./plan-list";
 import S3Configs from "./s3-list";
 
@@ -24,6 +25,7 @@ export default async function DashboardPage() {
       <DashboardHeader heading="System Settings" text="" />
       <AppConfigs />
       <S3Configs />
+      <GmailList />
       <DomainList
         user={{
           id: user.id,

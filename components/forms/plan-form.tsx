@@ -1,16 +1,13 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState, useTransition } from "react";
-import Link from "next/link";
+import { Dispatch, SetStateAction, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@prisma/client";
-import { create, get } from "lodash";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { PlanQuotaFormData } from "@/lib/dto/plan";
-import { formatFileSize } from "@/lib/utils";
 import { createPlanSchema } from "@/lib/validations/plan";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,12 +41,6 @@ export function PlanForm({
   const t = useTranslations("List");
   const [isPending, startTransition] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
-  const [currentStMaxTotalSize, setCurrentStMaxTotalSize] = useState(
-    initData?.stMaxTotalSize || "5242880000",
-  );
-  const [currentStMaxFileSize, setCurrentStMaxFileSize] = useState(
-    initData?.stMaxFileSize || "26214400",
-  );
 
   const {
     handleSubmit,
@@ -77,6 +68,7 @@ export function PlanForm({
       appSupport: initData?.appSupport || "BASIC",
       appApiAccess: initData?.appApiAccess || false,
       isActive: initData?.isActive || false,
+      price: initData?.price ?? 0,
     },
   });
 
@@ -183,6 +175,33 @@ export function PlanForm({
               ) : (
                 <p className="pb-0.5 text-[13px] text-muted-foreground">
                   {t("Required")}. {t("Plan name must be unique")}
+                </p>
+              )}
+            </div>
+          </FormSectionColumns>
+          <FormSectionColumns title="Price (USDT)">
+            <div className="flex w-full items-center gap-2">
+              <Label className="sr-only" htmlFor="plan-price">
+                Price (USDT)
+              </Label>
+              <Input
+                id="plan-price"
+                className="flex-1 shadow-inner"
+                size={32}
+                type="number"
+                step="0.01"
+                min={0}
+                {...register("price", { valueAsNumber: true })}
+              />
+            </div>
+            <div className="flex flex-col justify-between p-1">
+              {errors?.price ? (
+                <p className="pb-0.5 text-[13px] text-red-600">
+                  {errors.price.message}
+                </p>
+              ) : (
+                <p className="pb-0.5 text-[13px] text-muted-foreground">
+                  Giá gói dùng cho thanh toán USDT.
                 </p>
               )}
             </div>
@@ -369,6 +388,32 @@ export function PlanForm({
               ) : (
                 <p className="pb-0.5 text-[13px] text-muted-foreground">
                   {t("Monthly limit of emails sent")}.
+                </p>
+              )}
+            </div>
+          </FormSectionColumns>
+          {/* "Temp Gmail Limit" - tempGmailLimit */}
+          <FormSectionColumns title="Temp Gmail Limit">
+            <div className="flex w-full items-center gap-2">
+              <Label className="sr-only" htmlFor="Temp-Gmail-Limit">
+                Temp Gmail Limit
+              </Label>
+              <Input
+                id="temp-gmail-limit"
+                className="flex-1 shadow-inner"
+                size={32}
+                type="number"
+                {...register("tempGmailLimit", { valueAsNumber: true })}
+              />
+            </div>
+            <div className="flex flex-col justify-between p-1">
+              {errors?.tempGmailLimit ? (
+                <p className="pb-0.5 text-[13px] text-red-600">
+                  {errors.tempGmailLimit.message}
+                </p>
+              ) : (
+                <p className="pb-0.5 text-[13px] text-muted-foreground">
+                  Max number of temp gmails user can create.
                 </p>
               )}
             </div>

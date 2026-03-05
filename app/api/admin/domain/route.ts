@@ -6,8 +6,11 @@ import {
   getAllDomains,
   updateDomain,
 } from "@/lib/dto/domains";
+import { getMultipleConfigs, setSystemConfig } from "@/lib/dto/system-config";
 import { checkUserStatus } from "@/lib/dto/user";
 import { getCurrentUser } from "@/lib/session";
+
+const EMAIL_PRO_DOMAINS_KEY = "email_pro_domains";
 
 // Get domains list
 export async function GET(req: NextRequest) {
@@ -29,7 +32,18 @@ export async function GET(req: NextRequest) {
       target,
     );
 
-    return Response.json(data, { status: 200 });
+    const configs = await getMultipleConfigs([EMAIL_PRO_DOMAINS_KEY]);
+    const proDomains = new Set(
+      Array.isArray(configs[EMAIL_PRO_DOMAINS_KEY])
+        ? configs[EMAIL_PRO_DOMAINS_KEY]
+        : [],
+    );
+    const list = data.list.map((domain) => ({
+      ...domain,
+      pro_email_only: proDomains.has(domain.domain_name),
+    }));
+
+    return Response.json({ ...data, list }, { status: 200 });
   } catch (error) {
     console.error("[Error]", error);
     return Response.json(error.message || "Server error", { status: 500 });
@@ -103,6 +117,7 @@ export async function PUT(req: NextRequest) {
       max_email_forwards,
       max_dns_records,
       active,
+      pro_email_only,
       id,
     } = await req.json();
     if (!id) {
@@ -129,7 +144,33 @@ export async function PUT(req: NextRequest) {
       max_dns_records,
     });
 
-    return Response.json(updatedDomain, { status: 200 });
+    if (typeof pro_email_only === "boolean") {
+      const configs = await getMultipleConfigs([EMAIL_PRO_DOMAINS_KEY]);
+      const currentProDomains = Array.isArray(configs[EMAIL_PRO_DOMAINS_KEY])
+        ? configs[EMAIL_PRO_DOMAINS_KEY]
+        : [];
+      const nextProDomains = currentProDomains.filter(
+        (item) => item !== domain_name && item !== updatedDomain.domain_name,
+      );
+      if (pro_email_only) {
+        nextProDomains.push(updatedDomain.domain_name);
+      }
+
+      await setSystemConfig(
+        EMAIL_PRO_DOMAINS_KEY,
+        Array.from(new Set(nextProDomains)),
+        "OBJECT",
+        "Email domains that require PRO plan",
+      );
+    }
+
+    return Response.json(
+      {
+        ...updatedDomain,
+        pro_email_only: !!pro_email_only,
+      },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("[Error]", error);
     return Response.json(error.message || "Server error", { status: 500 });

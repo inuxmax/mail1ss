@@ -1,0 +1,247 @@
+API tạo hóa đơn thanh toán
+**POST** or **GET** `/api/AddInvoice`
+Tạo hóa đơn mới bằng cách sử dụng URL và thông số API được cung cấp.
+
+Request Parameters:
+merchant_id: ID cửa hàng (Không được để lộ ra ngoài).
+api_key: API KEY của cửa hàng (Không được để lộ ra ngoài).
+name: Nhập tên hóa đơn.
+description: Nhập mô tả hóa đơn.
+amount: Số lượng USDT.
+request_id: ID giao dịch bí mật của hệ thống của bạn (được sử dụng để xác minh khi callback).
+callback_url: URL nhận kết quả giao dịch.
+success_url: URL để chuyển hướng sau khi thanh toán thành công.
+cancel_url: URL để chuyển hướng sau khi thanh toán không thành công.
+API URL:
+POST or GET
+https://app.fpayment.net/api/AddInvoice
+
+Copy
+Response:
+{
+  "data": {
+    "trans_id": "TX2604571052543841",
+    "amount": "12.001",
+    "status": "waiting",
+    "url_payment": "https://app.fpayment.net/payment/TX2604571052543841"
+  },
+  "status": "success",
+  "msg": "Invoice creation successful!"
+}
+            
+Code PHP mẫu dùng để tạo hóa đơn:
+<?php
+$curl = curl_init();
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://app.fpayment.net/api/AddInvoice",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',
+  CURLOPT_POSTFIELDS => array(
+      'merchant_id'     => "ID cửa hàng",                          // Không được để lộ thông tin này
+      'api_key'         => "API KEY của cửa hàng",                 // Không được để lộ thông tin này
+      'name'            => 'Invoice Name',                         // Tên hóa đơn ví dụ như: Nạp tiền vào website abc.xyz
+      'description'     => 'Invoice Description',                  // Mô tả hóa đơn ví dụ như: Username hoặc Email của user tạo hóa đơn
+      'amount'          => '12',                                   // Số tiền user muốn nạp vào hệ thống bạn (nhập USDT)
+      'request_id'      => 'unique_transaction_id',                // Mã giao dịch bí mật của hệ thống bạn dùng để so sánh giao dịch của user nào
+      'callback_url'    => 'https://yourwebsite.com/callback',     // Liên kết dùng nhận kết quả giao dịch
+      'success_url'     => 'https://yourwebsite.com/success',      // Liên kết khi người dùng nhấn nút Return to Website khi hóa đơn xử lý thành công
+      'cancel_url'      => 'https://yourwebsite.com/cancel'        // Liên kết khi người dùng nhấn nút Return to Website khi hóa đơn hết hạn
+  ),
+));
+$response = curl_exec($curl);
+curl_close($curl);
+$result = json_decode($response, true);
+
+// Xử lý kết quả cURL sau đó lưu vào Database để đem ra xử lý khi có callback
+if($result['status'] == 'success'){
+    // Tạo hóa đơn thành công, lưu thông tin hóa đơn vào Database
+    $trans_id       = $result['data']['trans_id'];      // Mã giao dịch FPAYMENT trả về
+    $amount         = $result['data']['amount'];        // Số tiền mà user cần phải chuyển đúng chính xác
+    $status         = $result['data']['status'];        // Trạng thái hóa đơn sau khi tạo là waiting
+    $url_payment    = $result['data']['url_payment'];   // Liên kết trang thanh toán, chuyển hướng đến link này để cho user tiến hành thanh toán
+
+    // Đoạn code lưu thông tin hóa đơn vào database
+
+}else{
+    // Trả thông báo lỗi cho user
+}
+?>
+
+
+
+Callback xác minh giao dịch
+Callback sẽ được gửi về liên kết mà bạn đã nhập vào callback_url khi tạo hóa đơn.
+
+Dữ liệu gửi về callback phương thức GET:
+request_id: Mã giao dịch bí mật của hệ thống bạn gửi lên API dùng để phân biệt giao dịch (Không được để lộ ra ngoài).
+trans_id: Mã giao dịch của hóa đơn
+merchant_id: ID cửa hàng tạo hóa đơn (Không được để lộ ra ngoài).
+api_key: API KEY của cửa hàng tạo hóa đơn (Không được để lộ ra ngoài).
+received: Số lượng USDT thực nhận được.
+status: Trạng thái giao dịch bao gồm: waiting, expired, completed.
+from_address: Địa chỉ USDT gửi tiền trong trường hợp hóa đơn completed.
+transaction_id: Mã giao dịch trong blockchain trong trường hợp hóa đơn completed.
+Code callback.php mẫu dùng để xử lý giao dịch:
+<?php
+// Nhận request từ callback
+$request_data = $_GET;
+
+// Lọc chuỗi để tránh SQL Injection và XSS
+function sanitize_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+    return $data;
+}
+
+// Kiểm tra các tham số callback nhận được
+if (!isset($request_data['request_id'], $request_data['merchant_id'], $request_data['api_key'], $request_data['received'], $request_data['status'])) {
+    http_response_code(400);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Thiếu tham số callback.'
+    ]);
+    exit;
+}
+
+$request_id = sanitize_input($request_data['request_id']);      // Mã giao dịch bí mật của hệ thống bạn gửi lên API dùng để phân biệt giao dịch (Không được để lộ ra ngoài)
+$trans_id = sanitize_input($request_data['trans_id']);          // Mã giao dịch của hóa đơn
+$merchant_id = sanitize_input($request_data['merchant_id']);    // ID cửa hàng tạo hóa đơn (Không được để lộ ra ngoài)
+$api_key = sanitize_input($request_data['api_key']);            // API KEY của cửa hàng tạo hóa đơn (Không được để lộ ra ngoài)
+$amount = sanitize_input($request_data['amount']);              // Số lượng USDT lúc bạn tạo hóa đơn
+$received = sanitize_input($request_data['received']);          // Số lượng USDT thực nhận được
+$status = sanitize_input($request_data['status']);              // Trạng thái giao dịch bao gồm: waiting, expired, completed
+$from_address = isset($request_data['from_address']) ? sanitize_input($request_data['from_address']) : null;        // Địa chỉ USDT gửi tiền trong trường hợp hóa đơn completed
+$transaction_id = isset($request_data['transaction_id']) ? sanitize_input($request_data['transaction_id']) : null;  // Mã giao dịch trong blockchain trong trường hợp hóa đơn completed
+
+// Xác minh tính hợp lệ của callback tránh giả mạo callback
+$expected_merchant_id = 'YOUR_MERCHANT_ID'; // Thay bằng Merchant ID của bạn
+$expected_api_key = 'YOUR_API_KEY'; // Thay bằng API Key của bạn
+if ($merchant_id !== $expected_merchant_id || $api_key !== $expected_api_key) {
+    http_response_code(403);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Merchant ID hoặc API Key không hợp lệ.'
+    ]);
+    exit;
+}
+
+// Xử lý trạng thái giao dịch
+switch ($status) {
+    case 'waiting':
+        // Giao dịch đang chờ thực hiện
+        // Thêm code để xử lý trạng thái đang chờ
+        break;
+    case 'expired':
+        // Giao dịch đã hết hạn
+        // Thêm code để xử lý khi giao dịch hết hạn
+        break;
+    case 'completed':
+        // Giao dịch đã hoàn tất
+        // Thêm code để cập nhật trạng thái giao dịch hoặc ghi nhận giao dịch
+        break;
+    default:
+        http_response_code(400);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Trạng thái giao dịch không hợp lệ.'
+        ]);
+        exit;
+}
+
+// Phản hồi callback thành công
+http_response_code(200);
+echo json_encode([
+    'status' => 'success',
+    'message' => 'Callback đã được xử lý thành công.'
+]);
+?>
+
+API lấy trạng thái giao dịch
+**POST** or **GET** `/api/GetInvoiceStatus`
+Lấy trạng thái của hóa đơn thanh toán bằng cách sử dụng mã giao dịch (trans_id).
+
+Request Parameters:
+merchant_id: ID cửa hàng (Không được để lộ ra ngoài).
+api_key: API KEY của cửa hàng (Không được để lộ ra ngoài).
+trans_id: Mã giao dịch của hóa đơn (trans_id được trả về khi tạo hóa đơn).
+API URL:
+POST or GET
+https://app.fpayment.net/api/GetInvoiceStatus
+
+Copy
+Response:
+{
+  "data": {
+    "trans_id": "TX2604571052543841",
+    "request_id": "unique_transaction_id",
+    "amount": "12.001",
+    "received": "12.001",
+    "status": "waiting",
+    "from_address": null,
+    "transaction_id": null,
+    "create_gettime": "2024-01-01 12:00:00",
+    "update_gettime": "2024-01-01 12:00:00"
+  },
+  "status": "success",
+  "msg": "Get invoice status successful!"
+}
+            
+Lưu ý: Trạng thái (status) có thể là: waiting (đang chờ), completed (đã hoàn tất), expired (đã hết hạn). Các trường from_address và transaction_id chỉ có giá trị khi status là completed.
+
+Code PHP mẫu dùng để lấy trạng thái hóa đơn:
+<?php
+$curl = curl_init();
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://app.fpayment.net/api/GetInvoiceStatus",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',
+  CURLOPT_POSTFIELDS => array(
+      'merchant_id'     => "ID cửa hàng",                          // Không được để lộ thông tin này
+      'api_key'         => "API KEY của cửa hàng",                 // Không được để lộ thông tin này
+      'trans_id'        => 'TX2604571052543841'                     // Mã giao dịch của hóa đơn
+  ),
+));
+$response = curl_exec($curl);
+curl_close($curl);
+$result = json_decode($response, true);
+
+// Xử lý kết quả
+if($result['status'] == 'success'){
+    $trans_id       = $result['data']['trans_id'];         // Mã giao dịch
+    $request_id     = $result['data']['request_id'];       // Mã giao dịch bí mật của hệ thống bạn
+    $amount         = $result['data']['amount'];          // Số tiền hóa đơn
+    $received       = $result['data']['received'];        // Số tiền thực nhận được
+    $status         = $result['data']['status'];          // Trạng thái: waiting, completed, expired
+    $from_address   = $result['data']['from_address'];     // Địa chỉ USDT gửi tiền (chỉ có khi completed)
+    $transaction_id = $result['data']['transaction_id'];  // Mã giao dịch blockchain (chỉ có khi completed)
+    $create_gettime = $result['data']['create_gettime'];   // Thời gian tạo hóa đơn
+    $update_gettime = $result['data']['update_gettime'];   // Thời gian cập nhật cuối cùng
+
+    // Xử lý theo trạng thái
+    switch($status){
+        case 'waiting':
+            // Hóa đơn đang chờ thanh toán
+            break;
+        case 'completed':
+            // Hóa đơn đã thanh toán thành công
+            break;
+        case 'expired':
+            // Hóa đơn đã hết hạn
+            break;
+    }
+}else{
+    // Xử lý lỗi
+    $error_msg = $result['msg'];
+}
+?>

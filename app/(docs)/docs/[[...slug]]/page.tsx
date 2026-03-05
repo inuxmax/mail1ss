@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { allDocs } from "contentlayer/generated";
 
 import { getTableOfContents } from "@/lib/toc";
@@ -52,6 +52,9 @@ export async function generateStaticParams(): Promise<
 }
 
 export default async function DocPage({ params }: DocPageProps) {
+  if (!params.slug || params.slug.length === 0) {
+    redirect("/docs/emails");
+  }
   const doc = await getDocFromParams(params);
 
   if (!doc) {

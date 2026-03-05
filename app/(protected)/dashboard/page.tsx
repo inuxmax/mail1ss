@@ -2,8 +2,10 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { UserRole } from "@prisma/client";
 
-import { getUserRecordCount } from "@/lib/dto/cloudflare-dns-record";
-import { getAllUserEmailsCount } from "@/lib/dto/email";
+import {
+  getAllUserEmailsCount,
+  getAllUserInboxEmailsCount,
+} from "@/lib/dto/email";
 import { getPlanQuota, PlanQuota } from "@/lib/dto/plan";
 import { getUserShortUrlCount } from "@/lib/dto/short-urls";
 import { getCurrentUser } from "@/lib/session";
@@ -15,7 +17,6 @@ import {
 } from "@/components/dashboard/dashboard-info-card";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
 
-import UserRecordsList from "./records/record-list";
 import UserUrlsList from "./urls/url-list";
 
 export const metadata = constructMetadata({
@@ -63,24 +64,34 @@ async function ShortUrlsCardSection({
   );
 }
 
-async function DnsRecordsCardSection({
-  userId,
-  plan,
-}: {
-  userId: string;
-  plan: PlanQuota;
-}) {
-  const record_count = await getUserRecordCount(userId);
+async function SystemEmailsCardSection({ userId }: { userId: string }) {
+  const email_count = await getAllUserEmailsCount(userId, "ADMIN");
 
   return (
     <DashboardInfoCard
       userId={userId}
-      title="DNS Records"
-      total={record_count.total}
-      monthTotal={record_count.month_total}
-      limit={plan.rcNewRecords}
-      link="/dashboard/records"
-      icon="globeLock"
+      title="Emails"
+      total={email_count.total}
+      monthTotal={email_count.month_total}
+      limit={1000000}
+      link="/emails"
+      icon="mail"
+    />
+  );
+}
+
+async function SystemInboxCardSection({ userId }: { userId: string }) {
+  const inbox_count = await getAllUserInboxEmailsCount();
+
+  return (
+    <DashboardInfoCard
+      userId={userId}
+      title="Inbox"
+      total={inbox_count.total}
+      monthTotal={inbox_count.month_total}
+      limit={1000000}
+      link="/emails"
+      icon="inbox"
     />
   );
 }
@@ -110,31 +121,6 @@ async function UserUrlsListSection({
   );
 }
 
-async function UserRecordsListSection({
-  user,
-}: {
-  user: {
-    id: string;
-    name: string;
-    apiKey: string;
-    email: string;
-    role: UserRole;
-  };
-}) {
-  return (
-    <UserRecordsList
-      user={{
-        id: user.id,
-        name: user.name,
-        apiKey: user.apiKey,
-        email: user.email,
-        role: user.role,
-      }}
-      action="/api/record"
-    />
-  );
-}
-
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 
@@ -145,7 +131,7 @@ export default async function DashboardPage() {
   return (
     <>
       <div className="flex flex-col gap-5">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <ErrorBoundary
             fallback={<Skeleton className="h-32 w-full rounded-lg" />}
           >
@@ -170,27 +156,19 @@ export default async function DashboardPage() {
             <Suspense
               fallback={<Skeleton className="h-32 w-full rounded-lg" />}
             >
-              <DnsRecordsCardSection userId={user.id} plan={plan} />
+              <SystemEmailsCardSection userId={user.id} />
+            </Suspense>
+          </ErrorBoundary>
+          <ErrorBoundary
+            fallback={<Skeleton className="h-32 w-full rounded-lg" />}
+          >
+            <Suspense
+              fallback={<Skeleton className="h-32 w-full rounded-lg" />}
+            >
+              <SystemInboxCardSection userId={user.id} />
             </Suspense>
           </ErrorBoundary>
         </div>
-        <ErrorBoundary
-          fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
-        >
-          <Suspense
-            fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
-          >
-            <UserRecordsListSection
-              user={{
-                id: user.id,
-                name: user.name || "",
-                apiKey: user.apiKey || "",
-                email: user.email || "",
-                role: user.role,
-              }}
-            />
-          </Suspense>
-        </ErrorBoundary>
         <ErrorBoundary
           fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
         >

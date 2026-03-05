@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { getDomainsByFeature } from "@/lib/dto/domains";
 import {
   deleteUserEmail,
   getUserEmailById,
   updateUserEmail,
 } from "@/lib/dto/email";
+import { getMultipleConfigs } from "@/lib/dto/system-config";
 import { checkUserStatus } from "@/lib/dto/user";
+import { reservedAddressSuffix } from "@/lib/enums";
 import { getCurrentUser } from "@/lib/session";
+
+const EMAIL_PRO_DOMAINS_KEY = "email_pro_domains";
 
 // 查询单个 UserEmail
 export async function GET(
@@ -49,6 +54,25 @@ export async function PUT(
 
   if (!emailAddress) {
     return NextResponse.json("Missing emailAddress", { status: 400 });
+  }
+
+  const [prefix, suffix] = emailAddress.split("@");
+  const domains = await getDomainsByFeature("enable_email", true);
+  const availableDomains = domains.map((domain) => domain.domain_name);
+  if (!suffix || !availableDomains.includes(suffix)) {
+    return NextResponse.json("Invalid email suffix address", { status: 400 });
+  }
+  const configs = await getMultipleConfigs([EMAIL_PRO_DOMAINS_KEY]);
+  const proDomains = Array.isArray(configs[EMAIL_PRO_DOMAINS_KEY])
+    ? configs[EMAIL_PRO_DOMAINS_KEY]
+    : [];
+  if ((user.team || "").toLowerCase() === "free" && proDomains.includes(suffix)) {
+    return NextResponse.json("This domain is for PRO plan only", {
+      status: 403,
+    });
+  }
+  if (reservedAddressSuffix.includes(prefix || "")) {
+    return NextResponse.json("Invalid email address", { status: 400 });
   }
 
   try {

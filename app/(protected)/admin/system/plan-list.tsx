@@ -36,9 +36,12 @@ export interface PlanListProps {
 
 function TableColumnSekleton() {
   return (
-    <TableRow className="grid grid-cols-4 items-center sm:grid-cols-8">
+    <TableRow className="grid grid-cols-4 items-center sm:grid-cols-9">
       <TableCell className="col-span-1 flex">
         <Skeleton className="h-5 w-20" />
+      </TableCell>
+      <TableCell className="col-span-1 hidden sm:flex">
+        <Skeleton className="h-5 w-16" />
       </TableCell>
       <TableCell className="col-span-1 hidden sm:flex">
         <Skeleton className="h-5 w-16" />
@@ -134,7 +137,7 @@ export default function PlanList({ user, action }: PlanListProps) {
         <CardContent>
           <Table>
             <TableHeader className="bg-gray-100/50 dark:bg-primary-foreground">
-              <TableRow className="grid grid-cols-4 items-center text-xs sm:grid-cols-8">
+              <TableRow className="grid grid-cols-4 items-center text-xs sm:grid-cols-9">
                 <TableHead className="col-span-1 flex items-center font-bold">
                   {t("Plan Name")}
                 </TableHead>
@@ -149,6 +152,9 @@ export default function PlanList({ user, action }: PlanListProps) {
                 </TableHead>
                 <TableHead className="col-span-1 hidden items-center text-nowrap font-bold sm:flex">
                   {t("Record Limit")}
+                </TableHead>
+                <TableHead className="col-span-1 hidden items-center text-nowrap font-bold sm:flex">
+                  Price
                 </TableHead>
                 <TableHead className="col-span-1 flex items-center text-nowrap font-bold">
                   {t("Active")}
@@ -173,7 +179,7 @@ export default function PlanList({ user, action }: PlanListProps) {
               ) : data && data.list && data.list.length ? (
                 data.list.map((plan) => (
                   <div className="border-b" key={plan.id}>
-                    <TableRow className="grid grid-cols-4 items-center sm:grid-cols-8">
+                    <TableRow className="grid grid-cols-4 items-center sm:grid-cols-9">
                       <TableCell className="col-span-1 flex items-center gap-1">
                         {plan.name}
                       </TableCell>
@@ -188,6 +194,9 @@ export default function PlanList({ user, action }: PlanListProps) {
                       </TableCell>
                       <TableCell className="col-span-1 hidden items-center gap-1 sm:flex">
                         {nFormatter(plan.rcNewRecords)}
+                      </TableCell>
+                      <TableCell className="col-span-1 hidden items-center gap-1 sm:flex">
+                        {Number(plan.price) > 0 ? `${Number(plan.price)} USDT` : "0"}
                       </TableCell>
                       <TableCell className="col-span-1 flex items-center gap-1">
                         <Switch
