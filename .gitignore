@@ -41,3 +41,8 @@ next-env.d.ts
 
 .vscode
 .contentlayer
+
+# pwa
+public/sw.js
+public/workbox-*.js
+public/worker-*.js
