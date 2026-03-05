@@ -11,13 +11,13 @@ import { cn, fetcher } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Icons } from "@/components/shared/icons";
@@ -171,20 +171,13 @@ export function TempGmailSidebar({
       return result;
   }
 
-  const handleRandom = (accountId?: string) => {
-      const targetId = accountId || selectedBaseAccount;
-      if (!targetId && accounts && accounts.length > 0) {
-           // Randomly select account
+  const handleRandom = () => {
+      if (accounts && accounts.length > 0) {
+           // Always randomly select account
            const randomAccount = accounts[Math.floor(Math.random() * accounts.length)];
            setSelectedBaseAccount(randomAccount.id);
            const [baseLocal] = randomAccount.email.split("@");
            setCustomLocalPart(generateRandomDot(baseLocal));
-      } else if (targetId) {
-          const account = accounts?.find(a => a.id === targetId);
-          if (account) {
-              const [baseLocal] = account.email.split("@");
-              setCustomLocalPart(generateRandomDot(baseLocal));
-          }
       }
   }
 
@@ -253,13 +246,7 @@ export function TempGmailSidebar({
           size="icon"
           onClick={() => {
             setIsOpen(true);
-            if (accounts && accounts.length > 0) {
-                 // Randomly select an account and generate alias immediately
-                 const randomAccount = accounts[Math.floor(Math.random() * accounts.length)];
-                 setSelectedBaseAccount(randomAccount.id);
-                 const [baseLocal] = randomAccount.email.split("@");
-                 setCustomLocalPart(generateRandomDot(baseLocal));
-            }
+            handleRandom();
           }}
         >
           <Plus className="size-4" />
@@ -403,30 +390,15 @@ export function TempGmailSidebar({
                                 className="w-full rounded-r-none"
                                 required
                             />
-                             <Select
-                                value={selectedBaseAccount}
-                                onValueChange={(val) => {
-                                    setSelectedBaseAccount(val);
-                                    handleRandom(val);
-                                }}
-                            >
-                                <SelectTrigger className="w-[200px] rounded-none border-x-0 shadow-inner bg-muted/50">
-                                    <SelectValue placeholder="Select base" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {accounts?.map((acc) => (
-                                        <SelectItem key={acc.id} value={acc.id}>
-                                            @{acc.email.split('@')[1]}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                             <div className="flex items-center justify-center border bg-muted/50 px-3 text-sm text-muted-foreground w-[120px] select-none">
+                                @gmail.com
+                             </div>
                              <Button
                                 className="rounded-l-none"
                                 type="button"
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleRandom()}
+                                onClick={handleRandom}
                             >
                                 <Sparkles className="h-4 w-4 text-slate-500" />
                             </Button>

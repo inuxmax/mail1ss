@@ -42,9 +42,26 @@ export async function GET(req: NextRequest) {
     });
 
     if (status === "completed") {
+      const user = await prisma.user.findUnique({
+        where: { id: transaction.userId },
+        select: { team: true, planExpiresAt: true }
+      });
+
+      let newExpiresAt = new Date();
+      // If user is already on the same plan and it hasn't expired, extend it
+      if (user?.team === transaction.plan.name && user?.planExpiresAt && user.planExpiresAt > new Date()) {
+        newExpiresAt = new Date(user.planExpiresAt);
+      }
+
+      // Add duration (months)
+      newExpiresAt.setMonth(newExpiresAt.getMonth() + (transaction.duration || 1));
+
       await prisma.user.update({
         where: { id: transaction.userId },
-        data: { team: transaction.plan.name },
+        data: { 
+          team: transaction.plan.name,
+          planExpiresAt: newExpiresAt
+        },
       });
     }
 

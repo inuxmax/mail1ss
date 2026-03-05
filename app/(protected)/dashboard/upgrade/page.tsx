@@ -33,26 +33,14 @@ const getBenefits = (plan: PlanQuotaFormData) => [
     checked: true,
     icon: <Icons.calendar className="size-4" />,
   },
-  {
-    text: `Customize short link QR code`,
-    checked: plan.slCustomQrCodeLogo,
-    icon: <Icons.qrcode className="size-4" />,
-  },
+
   {
     text: `${nFormatter(plan.emEmailAddresses)} email addresses/mo`,
     checked: true,
     icon: <Icons.mail className="size-4" />,
   },
-  {
-    text: `${nFormatter(plan.emSendEmails)} send emails/mo`,
-    checked: true,
-    icon: <Icons.send className="size-4" />,
-  },
-  {
-    text: `${plan.slDomains === 1 ? "One" : plan.slDomains} domain${plan.slDomains > 1 ? "s" : ""}`,
-    checked: true,
-    icon: <Icons.globe className="size-4" />,
-  },
+
+
   {
     text: "Advanced analytics",
     checked: plan.slAdvancedAnalytics,
@@ -149,10 +137,14 @@ const PriceCard = ({ tier, price, bestFor, CTA, benefits }: PriceCardProps) => {
 export default function UpgradePage() {
   const { data: plans, isLoading } = useSWR<{ list: PlanQuotaFormData[] }>(
     "/api/plan?all=1",
-    fetcher,
+    (url) => fetcher(url).then(res => ({
+        ...res,
+        list: res.list.sort((a: any, b: any) => Number(a.price) - Number(b.price))
+    }))
   );
   const { toast } = useToast();
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
+  const [duration, setDuration] = useState<number>(1);
 
   const handleUpgrade = async (plan: PlanQuotaFormData) => {
     if (!plan.id) return;
@@ -161,9 +153,10 @@ export default function UpgradePage() {
       const res = await fetch("/api/payment/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId: plan.id }),
+        body: JSON.stringify({ planId: plan.id, duration }),
       });
       const data = await res.json();
+      
       if (!res.ok) throw new Error(data.error || "Failed to create invoice");
 
       if (data.url) {
@@ -184,14 +177,34 @@ export default function UpgradePage() {
 
   return (
     <div className="container py-10">
-      <h1 className="mb-8 text-center text-3xl font-bold">Upgrade Your Plan</h1>
+      <h1 className="mb-4 text-center text-3xl font-bold">Upgrade Your Plan</h1>
+      
+      <div className="mb-8 flex justify-center">
+        <div className="inline-flex rounded-lg border bg-card p-1 text-card-foreground shadow-sm">
+            {[1, 3, 6, 12].map((d) => (
+                <button
+                    key={d}
+                    onClick={() => setDuration(d)}
+                    className={cn(
+                        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                        duration === d 
+                            ? "bg-background text-foreground shadow" 
+                            : "hover:bg-muted hover:text-muted-foreground"
+                    )}
+                >
+                    {d} Month{d > 1 ? 's' : ''}
+                </button>
+            ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {plans?.list.map((plan) => (
           <PriceCard
             key={plan.id}
             tier={plan.name}
-            price={Number(plan.price) > 0 ? `${Number(plan.price)} USDT` : "Free"}
-            bestFor="Unlock higher quotas instantly"
+            price={Number(plan.price) > 0 ? `${(Number(plan.price) * duration).toFixed(2)} USDT` : "Free"}
+            bestFor={`For ${duration} month${duration > 1 ? 's' : ''}`}
             benefits={getBenefits(plan)}
             CTA={
               <Button

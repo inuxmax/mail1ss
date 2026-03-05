@@ -10,10 +10,14 @@ export async function POST(req: NextRequest) {
     const user = checkUserStatus(await getCurrentUser());
     if (user instanceof Response) return user;
 
-    const { planId } = await req.json();
+    const { planId, duration = 1 } = await req.json();
 
     if (!planId) {
       return Response.json({ error: "Plan ID is required" }, { status: 400 });
+    }
+
+    if (![1, 3, 6, 12].includes(duration)) {
+        return Response.json({ error: "Invalid duration" }, { status: 400 });
     }
 
     const plan = await prisma.plan.findUnique({
@@ -30,25 +34,27 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: "Plan price must be greater than 0" }, { status: 400 });
     }
 
+    const totalAmount = Number(plan.price) * duration;
     const requestId = crypto.randomUUID();
 
     const transaction = await prisma.transaction.create({
       data: {
         userId: user.id,
         planId: plan.id,
-        amount: plan.price,
+        amount: totalAmount,
         requestId,
         status: "waiting",
+        duration: duration
       },
     });
 
     const baseUrl = env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const invoice = await createInvoice({
-      name: `Upgrade to ${plan.name}`,
-      description: `Upgrade user ${user.email} to ${plan.name} plan`,
-      amount: Number(plan.price),
+      name: `Upgrade to ${plan.name} (${duration} month${duration > 1 ? 's' : ''})`,
+      description: `Upgrade user ${user.email} to ${plan.name} plan for ${duration} month(s)`,
+      amount: totalAmount,
       requestId,
-      callbackUrl: `${baseUrl}/api/payment/callback`,
+      callbackUrl: `${baseUrl}/api/payment/callback?requestId=${requestId}`,
       successUrl: `${baseUrl}/dashboard?payment=success`,
       cancelUrl: `${baseUrl}/dashboard?payment=cancel`,
     });

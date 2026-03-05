@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const createSchema = z.object({
-  gmailAccountId: z.string(),
+  gmailAccountId: z.string().optional(),
   tempEmailAddress: z.string().email(),
 });
 
@@ -69,9 +69,25 @@ export async function POST(req: Request) {
     return new NextResponse(`Plan limit reached (${limit}). Upgrade to create more temp gmails.`, { status: 403 });
   }
 
-  const gmailAccount = await prisma.gmailAccount.findUnique({
-    where: { id: gmailAccountId }
-  });
+  let gmailAccount;
+
+  if (gmailAccountId) {
+    gmailAccount = await prisma.gmailAccount.findUnique({
+      where: { id: gmailAccountId }
+    });
+  } else {
+    // Randomly select an active Gmail account
+    const activeAccounts = await prisma.gmailAccount.findMany({
+      where: { isActive: true }
+    });
+    
+    if (activeAccounts.length === 0) {
+      return new NextResponse("No active Gmail accounts available", { status: 503 });
+    }
+
+    const randomIndex = Math.floor(Math.random() * activeAccounts.length);
+    gmailAccount = activeAccounts[randomIndex];
+  }
 
   if (!gmailAccount) {
     return new NextResponse("Gmail account not found", { status: 404 });
@@ -113,7 +129,7 @@ export async function POST(req: Request) {
     const newTemp = await prisma.userTempGmail.create({
       data: {
         userId: user.id,
-        gmailAccountId,
+        gmailAccountId: gmailAccount.id,
         tempEmailAddress
       },
       include: {

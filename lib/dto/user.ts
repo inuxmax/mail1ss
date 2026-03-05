@@ -41,11 +41,22 @@ export const getUserById = async (id: string) => {
         role: true,
         active: true,
         team: true,
+        planExpiresAt: true,
         apiKey: true,
         createdAt: true,
         updatedAt: true,
       },
     });
+
+    if (user && user.planExpiresAt && user.planExpiresAt < new Date() && user.team !== "free") {
+      // Plan expired, downgrade to free
+      await prisma.user.update({
+        where: { id },
+        data: { team: "free", planExpiresAt: null }
+      });
+      user.team = "free";
+      user.planExpiresAt = null;
+    }
 
     return user;
   } catch {
