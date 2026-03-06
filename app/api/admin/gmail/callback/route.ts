@@ -15,6 +15,7 @@ export async function GET(req: Request) {
     const { tokens } = await oauth2Client.getToken(code);
     const accessToken = tokens.access_token;
     const refreshToken = tokens.refresh_token;
+    const expiry = tokens.expiry_date;
 
     if (!accessToken || !refreshToken) {
       console.warn("Missing tokens", tokens);
@@ -30,8 +31,19 @@ export async function GET(req: Request) {
 
     await prisma.gmailAccount.upsert({
       where: { email },
-      update: { refreshToken, isActive: true },
-      create: { email, refreshToken, isActive: true },
+      update: {
+        refreshToken,
+        accessToken,
+        expiresAt: expiry ? BigInt(expiry) : BigInt(Date.now() + 3600 * 1000),
+        isActive: true,
+      },
+      create: {
+        email,
+        refreshToken,
+        accessToken,
+        expiresAt: expiry ? BigInt(expiry) : BigInt(Date.now() + 3600 * 1000),
+        isActive: true,
+      },
     });
 
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/admin/system`);

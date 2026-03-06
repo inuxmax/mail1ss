@@ -1,13 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { NextResponse } from "next/server";
-import { z } from "zod";
-
-const routeContextSchema = z.object({
-  params: z.object({
-    id: z.string(),
-  }),
-});
 
 export async function GET(req: Request) {
   try {
@@ -21,14 +14,41 @@ export async function GET(req: Request) {
     const page = parseInt(searchParams.get("page") ?? "1");
     const pageSize = parseInt(searchParams.get("pageSize") ?? "10");
 
-    const [total, list] = await prisma.$transaction([
+    const [total, listRaw] = await prisma.$transaction([
       prisma.gmailAccount.count(),
       prisma.gmailAccount.findMany({
         skip: (page - 1) * pageSize,
         take: pageSize,
         orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          email: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+          expiresAt: true,
+        },
       }),
     ]);
+
+    const now = Date.now();
+    const list = listRaw.map((acc) => {
+      const expiresAtMs =
+        acc.expiresAt !== null && acc.expiresAt !== undefined
+          ? Number(acc.expiresAt)
+          : null;
+      const expired = !expiresAtMs || expiresAtMs < now;
+      const status = acc.isActive ? (expired ? "Token expired" : "Active") : "Inactive";
+      return {
+        id: acc.id,
+        email: acc.email,
+        isActive: acc.isActive,
+        createdAt: acc.createdAt,
+        updatedAt: acc.updatedAt,
+        status,
+        expiresAtMs,
+      };
+    });
 
     return NextResponse.json({ total, list });
   } catch (error) {

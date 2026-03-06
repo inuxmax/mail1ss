@@ -18,14 +18,24 @@ import {
 } from "@/components/ui/table";
 import { EmptyPlaceholder } from "@/components/shared/empty-placeholder";
 import { TimeAgoIntl } from "@/components/shared/time-ago";
-import { GmailAccount } from "@prisma/client";
+
+type GmailAccountItem = {
+  id: string;
+  email: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  status: string;
+  expiresAtMs: number | null;
+};
 
 export default function GmailList() {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState<string | null>(null);
 
   const { data, isLoading, mutate } = useSWR<{
     total: number;
-    list: GmailAccount[];
+    list: GmailAccountItem[];
   }>("/api/admin/gmail?page=1&pageSize=10", fetcher);
 
   const handleDelete = async (id: string) => {
@@ -43,6 +53,22 @@ export default function GmailList() {
       toast.error("Something went wrong");
     } finally {
       setIsDeleting(null);
+    }
+  };
+
+  const handleRefresh = async (id: string) => {
+    setIsRefreshing(id);
+    try {
+      const res = await fetch(`/api/admin/gmail/refresh?id=${id}`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to refresh token");
+      toast.success("Access token refreshed");
+      mutate();
+    } catch (error) {
+      toast.error("Refresh token failed");
+    } finally {
+      setIsRefreshing(null);
     }
   };
 
@@ -78,6 +104,7 @@ export default function GmailList() {
                 <TableRow>
                   <TableHead>Email</TableHead>
                   <TableHead>Connected At</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -90,7 +117,41 @@ export default function GmailList() {
                     <TableCell>
                       <TimeAgoIntl date={new Date(account.createdAt)} />
                     </TableCell>
+                    <TableCell>
+                      <span
+                        className={
+                          "inline-flex rounded-full px-2 py-0.5 text-xs " +
+                          (account.status === "Active"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                            : account.status === "Token expired"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                            : "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300")
+                        }
+                      >
+                        {account.status}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => (window.location.href = "/api/admin/gmail/connect")}
+                        >
+                          Reconnect
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={isRefreshing === account.id}
+                          onClick={() => handleRefresh(account.id)}
+                        >
+                          {isRefreshing === account.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            "Refresh"
+                          )}
+                        </Button>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -103,6 +164,7 @@ export default function GmailList() {
                           <Trash className="h-4 w-4 text-destructive" />
                         )}
                       </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
