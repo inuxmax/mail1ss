@@ -62,6 +62,7 @@ export function PlanForm({
       emEmailAddresses: initData?.emEmailAddresses ?? 100,
       emDomains: initData?.emDomains ?? 1,
       emSendEmails: initData?.emSendEmails ?? 100,
+      tempGmailLimit: initData?.tempGmailLimit ?? 0,
       stMaxFileSize: initData?.stMaxFileSize || "26214400",
       stMaxTotalSize: initData?.stMaxTotalSize || "524288000",
       stMaxFileCount: initData?.stMaxFileCount ?? 1000,

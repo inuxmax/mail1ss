@@ -234,6 +234,52 @@ export async function getAllUserInboxEmailsCount() {
   return { total, month_total };
 }
 
+// 查询所有 temp gmail 数量
+export async function getAllTempGmailCount() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999,
+  );
+
+  const [total, month_total] = await prisma.$transaction([
+    prisma.userTempGmail.count(),
+    prisma.userTempGmail.count({
+      where: { createdAt: { gte: start, lte: end } },
+    }),
+  ]);
+  return { total, month_total };
+}
+
+// 查询所有 temp gmail inbox 数量
+export async function getAllTempGmailInboxCount() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999,
+  );
+
+  const [total, month_total] = await prisma.$transaction([
+    prisma.tempGmailMessage.count(),
+    prisma.tempGmailMessage.count({
+      where: { createdAt: { gte: start, lte: end } },
+    }),
+  ]);
+  return { total, month_total };
+}
+
 // 创建 UserEmail
 export async function createUserEmail(
   userId: string,

@@ -26,17 +26,38 @@ export async function GET(req: Request) {
   
   try {
     const oauth2Client = getOAuth2Client();
-    oauth2Client.setCredentials({ refresh_token: gmailAccount.refreshToken });
-    
-    // Force refresh if needed or just get valid token
-    const { token } = await oauth2Client.getAccessToken();
-    
-    if (!token) {
+
+    // Check if we have a valid access token in DB
+    let accessToken = gmailAccount.accessToken;
+    let expiresAt = Number(gmailAccount.expiresAt || 0);
+    const now = Date.now();
+
+    // Refresh if expired or about to expire (within 30 mins) or no token
+    if (!accessToken || expiresAt - now < 30 * 60 * 1000) {
+        oauth2Client.setCredentials({ refresh_token: gmailAccount.refreshToken });
+        const { credentials } = await oauth2Client.refreshAccessToken();
+        
+        accessToken = credentials.access_token || null;
+        expiresAt = credentials.expiry_date || (Date.now() + 3600 * 1000);
+
+        if (accessToken) {
+            // Update DB
+            await prisma.gmailAccount.update({
+                where: { id: gmailAccount.id },
+                data: {
+                    accessToken,
+                    expiresAt: BigInt(expiresAt)
+                }
+            });
+        }
+    }
+
+    if (!accessToken) {
       return new NextResponse("Failed to refresh token", { status: 500 });
     }
 
     // Sync messages from Gmail to DB
-    await syncGmailMessages(user.id, gmailAccount.id, email, token);
+    await syncGmailMessages(user.id, gmailAccount.id, email, accessToken);
 
     // Fetch messages from DB
     const messages = await prisma.tempGmailMessage.findMany({

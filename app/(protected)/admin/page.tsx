@@ -5,6 +5,8 @@ import { getUserRecordCount } from "@/lib/dto/cloudflare-dns-record";
 import {
   getAllUserEmailsCount,
   getAllUserInboxEmailsCount,
+  getAllTempGmailCount,
+  getAllTempGmailInboxCount,
 } from "@/lib/dto/email";
 import { getScrapeStatsByType } from "@/lib/dto/scrape";
 import { getUserShortUrlCount } from "@/lib/dto/short-urls";
@@ -103,6 +105,40 @@ async function InboxCardSection({ userId }: { userId: string }) {
     <DashboardInfoCard
       userId={userId}
       title="Inbox"
+      total={inbox_count.total}
+      monthTotal={inbox_count.month_total}
+      limit={1000000}
+      link="/admin"
+      icon="inbox"
+    />
+  );
+}
+
+// Temp Gmail 卡片组件
+async function TempGmailCardSection({ userId }: { userId: string }) {
+  const email_count = await getAllTempGmailCount();
+
+  return (
+    <DashboardInfoCard
+      userId={userId}
+      title="Temp Gmails"
+      total={email_count.total}
+      monthTotal={email_count.month_total}
+      limit={1000000}
+      link="/admin"
+      icon="mail"
+    />
+  );
+}
+
+// Temp Gmail Inbox 卡片组件
+async function TempGmailInboxCardSection({ userId }: { userId: string }) {
+  const inbox_count = await getAllTempGmailInboxCount();
+
+  return (
+    <DashboardInfoCard
+      userId={userId}
+      title="Gmail Inbox"
       total={inbox_count.total}
       monthTotal={inbox_count.month_total}
       limit={1000000}
@@ -259,6 +295,26 @@ export default async function AdminPage() {
               fallback={<Skeleton className="h-32 w-full rounded-lg" />}
             >
               <InboxCardSection userId={user.id} />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <ErrorBoundary
+            fallback={<Skeleton className="h-32 w-full rounded-lg" />}
+          >
+            <Suspense
+              fallback={<Skeleton className="h-32 w-full rounded-lg" />}
+            >
+              <TempGmailCardSection userId={user.id} />
+            </Suspense>
+          </ErrorBoundary>
+          <ErrorBoundary
+            fallback={<Skeleton className="h-32 w-full rounded-lg" />}
+          >
+            <Suspense
+              fallback={<Skeleton className="h-32 w-full rounded-lg" />}
+            >
+              <TempGmailInboxCardSection userId={user.id} />
             </Suspense>
           </ErrorBoundary>
         </div>

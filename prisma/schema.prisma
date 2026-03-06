@@ -392,6 +392,8 @@ model GmailAccount {
   id           String   @id @default(uuid())
   email        String   @unique
   refreshToken String
+  accessToken  String?  @db.Text
+  expiresAt    BigInt?
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
