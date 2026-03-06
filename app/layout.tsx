@@ -14,6 +14,7 @@ import ModalProvider from "@/components/modals/providers";
 import GoogleAnalytics from "@/components/shared/GoogleAnalytics";
 import UmamiAnalytics from "@/components/shared/UmamiAnalytics";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
+import FloatingDonate from "@/components/layout/floating-donate";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -48,7 +49,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 enableSystem
                 disableTransitionOnChange
               >
-                <ModalProvider>{children}</ModalProvider>
+                <ModalProvider>
+                  {children}
+                  <FloatingDonate />
+                </ModalProvider>
                 <Toaster richColors closeButton position="bottom-right" />
                 <TailwindIndicator />
               </ThemeProvider>
