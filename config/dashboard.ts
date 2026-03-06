@@ -67,9 +67,10 @@ export const sidebarLinks: SidebarNavItem[] = [
         title: "Feedback",
       },
       {
-        href: "mailto:" + siteConfig.mailSupport,
-        icon: "mail",
+        href: "https://t.me/blackpink2812",
+        icon: "messageQuoted",
         title: "Support",
+        external: true,
       },
     ],
   },

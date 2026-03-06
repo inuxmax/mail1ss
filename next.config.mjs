@@ -69,7 +69,7 @@ const nextConfig = {
     return [
       {
         source: "/logo.png",
-        destination: "/_static/logo.png",
+        destination: "/_static/logo.svg",
       },
     ];
   },

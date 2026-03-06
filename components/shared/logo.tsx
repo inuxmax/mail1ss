@@ -18,7 +18,6 @@ export default function LogoIcon({
       className={className}
       {...props}
     >
-      <path color="#0070f3" strokeWidth="3" d="m12 14 4-4" />
       <defs>
         <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop
@@ -36,6 +35,7 @@ export default function LogoIcon({
         stroke="url(#gradient)"
         strokeWidth="3"
       />
+      <path d="M4 18 L4 6 L12 14 L20 6 L20 18" stroke="#0070f3" strokeWidth="3" />
     </svg>
   );
 }

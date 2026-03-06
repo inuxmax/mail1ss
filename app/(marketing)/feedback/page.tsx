@@ -1,5 +1,5 @@
 import { constructMetadata } from "@/lib/utils";
-import Comment from "@/components/shared/comment";
+import FeedbackPage from "@/components/feedback/feedback-page";
 
 export const metadata = constructMetadata({
   title: "Feedback",
@@ -7,5 +7,5 @@ export const metadata = constructMetadata({
 });
 
 export default async function Page() {
-  return <Comment />;
+  return <FeedbackPage />;
 }
