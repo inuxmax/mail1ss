@@ -197,6 +197,8 @@
     "Generate short link": "Shorten link",
     "Delete File": "Delete",
     "Select all": "Select all",
+    "Upload Files": "Upload Files",
+    "Max file size": "Max file size",
     "Delete selected": "Delete selected",
     "Update short link": "Update short link",
     "QR Code": "QR Code",
@@ -227,6 +229,8 @@
     "Configuration Error": "Configuration Error"
   },
   "Components": {
+    "Temp Gmails": "Temp Gmails",
+    "Gmail Inbox": "Gmail Inbox",
     "Dashboard": "Dashboard",
     "Live Logs": "Live Logs",
     "Real-time logs of short link visits": "Real-time logs of short link visits",
@@ -452,6 +456,7 @@
     "Unknown error": "Unknown error"
   },
   "System": {
+    "Manage Posts": "Manage Posts",
     "MENU": "Menu",
     "Dashboard": "Dashboard",
     "Short Urls": "Short Urls",
@@ -488,7 +493,7 @@
     "System Settings": "System Settings",
     "Cloud Storage": "Cloud Storage",
     "Temp Gmail": "Temp Gmail",
-    "Cloud Storage Manage": "Cloud Storage"
+    "Cloud Storage Manage": "Cloud Storage Manage"
   },
   "Email": {
     "Search emails": "Search emails",

@@ -17,7 +17,7 @@ export function PostFeed() {
     <div className="space-y-6 w-full mt-10 flex flex-col items-center">
         <div className="flex items-center gap-3 mb-2 w-full max-w-3xl">
           <div className="h-8 w-1.5 bg-primary rounded-full"></div>
-          <h2 className="text-2xl font-bold tracking-tight">Dòng Thời Gian Mail1s.net</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Mail1s.net Timeline</h2>
         </div>
         <div className="flex flex-col gap-8 w-full max-w-3xl">
             {data?.data?.map((post: any) => (

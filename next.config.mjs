@@ -131,7 +131,7 @@ const nextConfig = {
 
 const withPWA = nextPWA({
   dest: "public",
-  disable: false,
+  disable: true,
 });
 
 export default withContentlayer(withPWA(withNextIntl(nextConfig)));
