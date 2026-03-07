@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserTempGmail, GmailAccount } from "@prisma/client";
 import { Plus, Trash2, Copy, RefreshCw, Mail, Sparkles, Search, PanelRightClose, PanelLeftClose, ChevronLeft, ChevronRight, Inbox, MessageSquare, AlertCircle } from "lucide-react";
 import useSWR from "swr";
 import { toast } from "sonner";
@@ -23,6 +22,23 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Icons } from "@/components/shared/icons";
 import { TimeAgoIntl } from "@/components/shared/time-ago";
 import { CopyButton } from "@/components/shared/copy-button";
+
+type GmailAccount = {
+  id: string;
+  email: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type UserTempGmail = {
+  id: string;
+  userId: string;
+  gmailAccountId: string;
+  tempEmailAddress: string;
+  createdAt: string;
+  expiresAt?: string | null;
+};
 
 interface TempGmailSidebarProps {
   selectedEmail: string | null;

@@ -35,13 +35,13 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     }
 
     // Try to find in DB first
-    let dbMessage = await prisma.tempGmailMessage.findUnique({
+    let dbMessage = await (prisma as any).tempGmailMessage.findUnique({
         where: { gmailId: messageId }
     });
 
     // If not found, sync (this might be inefficient if only for one message, but reuses logic)
     if (!dbMessage) {
-        await syncGmailMessages(user.id, gmailAccount.id, email, token);
+        await syncGmailMessages(user.id, gmailAccount.id, email as string, token as string);
         dbMessage = await prisma.tempGmailMessage.findUnique({
             where: { gmailId: messageId }
         });

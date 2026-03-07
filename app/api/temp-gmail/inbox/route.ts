@@ -57,7 +57,7 @@ export async function GET(req: Request) {
     }
 
     // Sync messages from Gmail to DB
-    await syncGmailMessages(user.id, gmailAccount.id, email, accessToken);
+    await syncGmailMessages(user.id, gmailAccount.id, email as string, accessToken as string);
 
     // Fetch messages from DB
     const messages = await prisma.tempGmailMessage.findMany({

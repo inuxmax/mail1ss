@@ -1,4 +1,3 @@
-// import "server-only";
 import { PrismaClient } from "@prisma/client";
 
 declare global {
@@ -6,12 +5,12 @@ declare global {
   var cachedPrisma: PrismaClient;
 }
 
-export let prisma: PrismaClient;
+export let prisma: any;
 if (process.env.NODE_ENV === "production") {
-  prisma = new PrismaClient();
+  prisma = new PrismaClient() as any;
 } else {
   if (!global.cachedPrisma) {
     global.cachedPrisma = new PrismaClient();
   }
-  prisma = global.cachedPrisma;
+  prisma = global.cachedPrisma as any;
 }

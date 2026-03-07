@@ -27,7 +27,7 @@ export default function TempGmailPage() {
           !isCollapsed ? "w-64 xl:w-72" : "hidden",
           isMobile && !isCollapsed ? "w-screen" : "",
         )}
-        onSelectEmail={(email, id) => {
+        onSelectEmail={(email: string | null, id?: string | null) => {
             setSelectedEmail(email);
             if (id) setSelectedEmailId(id);
         }}

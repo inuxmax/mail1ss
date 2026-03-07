@@ -4,14 +4,27 @@ import { getOAuth2Client } from "@/lib/gmail";
 
 export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const secretQuery = searchParams.get("secret");
+    const secretHeader = req.headers.get("cron-secret");
+    const secret = secretQuery || secretHeader;
+
     const isCron = req.headers.get("x-vercel-cron");
-    const secret = req.headers.get("cron-secret");
     const host = req.headers.get("host") || "";
     const isLocal =
-      host.includes("localhost") || host.includes("127.0.0.1") || host.includes("::1");
-    const publicEnabled = process.env.CRON_PUBLIC === "true";
-    if (!isLocal && !isCron && !publicEnabled && secret !== process.env.CRON_SECRET) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      host.includes("localhost") ||
+      host.includes("127.0.0.1") ||
+      host.includes("::1");
+    
+    // Allow if local, or Vercel Cron, or public enabled, or secret matches env
+    const authorized =
+      isLocal ||
+      isCron ||
+      process.env.CRON_PUBLIC === "true" ||
+      (secret && secret === process.env.CRON_SECRET);
+
+    if (!authorized) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const oauth2Client = getOAuth2Client();
