@@ -16,6 +16,7 @@ import {
   HeroCard,
 } from "@/components/dashboard/dashboard-info-card";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { PostFeed } from "@/components/posts/post-feed";
 
 import UserUrlsList from "./urls/url-list";
 
@@ -169,23 +170,7 @@ export default async function DashboardPage() {
             </Suspense>
           </ErrorBoundary>
         </div>
-        <ErrorBoundary
-          fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
-        >
-          <Suspense
-            fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
-          >
-            <UserUrlsListSection
-              user={{
-                id: user.id,
-                name: user.name || "",
-                apiKey: user.apiKey || "",
-                role: user.role,
-                team: user.team,
-              }}
-            />
-          </Suspense>
-        </ErrorBoundary>
+        <PostFeed />
       </div>
     </>
   );

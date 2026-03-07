@@ -54,6 +54,12 @@ export const sidebarLinks: SidebarNavItem[] = [
         title: "System Settings",
         authorizeOnly: UserRole.ADMIN,
       },
+      {
+        href: "/admin/posts",
+        icon: "fileText",
+        title: "Manage Posts",
+        authorizeOnly: UserRole.ADMIN,
+      },
     ],
   },
   {
