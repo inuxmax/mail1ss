@@ -30,8 +30,20 @@ export async function GET(req: Request) {
     prisma.userTempGmail.count({ where: { userId: user.id } })
   ]);
 
+  const safeList = list.map((item) => ({
+    ...item,
+    gmailAccount: item.gmailAccount
+      ? {
+          ...item.gmailAccount,
+          expiresAt: item.gmailAccount.expiresAt
+            ? item.gmailAccount.expiresAt.toString()
+            : null,
+        }
+      : null,
+  }));
+
   return NextResponse.json({
-    items: list,
+    items: safeList,
     total,
     page,
     limit,
@@ -136,7 +148,20 @@ export async function POST(req: Request) {
         gmailAccount: true
       }
     });
-    return NextResponse.json(newTemp);
+
+    const safeNewTemp = {
+      ...newTemp,
+      gmailAccount: newTemp.gmailAccount
+        ? {
+            ...newTemp.gmailAccount,
+            expiresAt: newTemp.gmailAccount.expiresAt
+              ? newTemp.gmailAccount.expiresAt.toString()
+              : null,
+          }
+        : null,
+    };
+
+    return NextResponse.json(safeNewTemp);
   } catch (error: any) {
     console.error("Error creating temp gmail:", error);
     if (error.code === 'P2003') {
