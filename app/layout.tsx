@@ -15,6 +15,7 @@ import GoogleAnalytics from "@/components/shared/GoogleAnalytics";
 import UmamiAnalytics from "@/components/shared/UmamiAnalytics";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import FloatingDonate from "@/components/layout/floating-donate";
+import { PageTracker } from "@/components/analytics/page-tracker";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -60,6 +61,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </NextIntlClientProvider>
           <GoogleAnalytics />
           <UmamiAnalytics />
+          <PageTracker />
           <Script
             async
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4443334856736382"

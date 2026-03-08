@@ -229,6 +229,8 @@
     "Configuration Error": "Configuration Error"
   },
   "Components": {
+    "Total Visits": "Total Visits",
+    "Real-time Users": "Real-time Users",
     "Temp Gmails": "Temp Gmails",
     "Gmail Inbox": "Gmail Inbox",
     "Dashboard": "Dashboard",

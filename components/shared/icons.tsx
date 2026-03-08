@@ -68,6 +68,7 @@ import {
   UserCog,
   Users,
   X,
+  Activity,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -77,6 +78,8 @@ import LogoIcon from "./logo";
 export type Icon = LucideIcon;
 
 export const Icons = {
+  activity: Activity,
+  users: Users,
   add: Plus,
   arrowRight: ArrowRight,
   arrowUpRight: ArrowUpRight,

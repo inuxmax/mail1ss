@@ -521,3 +521,20 @@ model CommentLike {
   @@index([commentId])
   @@map("comment_likes")
 }
+
+model SiteVisit {
+  id        String   @id @default(cuid())
+  ip        String?
+  city      String?
+  country   String?
+  region    String?
+  browser   String?
+  os        String?
+  device    String?
+  path      String   @default("/")
+  
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("site_visits")
+}

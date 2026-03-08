@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
+import { getSiteAnalytics } from "@/lib/dto/analytics";
 import { getUserRecordCount } from "@/lib/dto/cloudflare-dns-record";
 import {
   getAllUserEmailsCount,
@@ -31,6 +32,29 @@ export const metadata = constructMetadata({
   title: "Admin – Mail1s.net",
   description: "Admin page for only admin management.",
 });
+
+async function SiteAnalyticsCards() {
+  const { totalVisits, realTimeUsers } = await getSiteAnalytics();
+
+  return (
+    <>
+      <UserInfoCard
+        userId="admin"
+        title="Total Visits"
+        count={totalVisits}
+        link="#"
+        icon="eye"
+      />
+      <UserInfoCard
+        userId="admin"
+        title="Real-time Users"
+        count={realTimeUsers}
+        link="#"
+        icon="users"
+      />
+    </>
+  );
+}
 
 // 用户卡片组件
 async function UserInfoCardSection({ userId }: { userId: string }) {
@@ -249,6 +273,18 @@ export default async function AdminPage() {
     <>
       <DashboardHeader heading="Admin Panel" text="" />
       <div className="flex flex-col gap-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Suspense
+            fallback={
+              <>
+                <Skeleton className="h-32 w-full rounded-lg" />
+                <Skeleton className="h-32 w-full rounded-lg" />
+              </>
+            }
+          >
+            <SiteAnalyticsCards />
+          </Suspense>
+        </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-3">
           <ErrorBoundary
             fallback={<Skeleton className="h-32 w-full rounded-lg" />}
