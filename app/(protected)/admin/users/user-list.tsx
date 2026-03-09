@@ -87,7 +87,12 @@ export default function UsersList({ user }: UrlListProps) {
   const t = useTranslations("List");
 
   const { mutate } = useSWRConfig();
-  const { data, isLoading } = useSWR<{ total: number; list: User[] }>(
+  const { data, isLoading } = useSWR<{
+    total: number;
+    list: User[];
+    adminCount: number;
+    userCount: number;
+  }>(
     `/api/user/admin?page=${currentPage}&size=${pageSize}&email=${searchParams.email}&userName=${searchParams.userName}`,
     fetcher,
     {
@@ -106,10 +111,22 @@ export default function UsersList({ user }: UrlListProps) {
     <>
       <Card className="xl:col-span-2">
         <CardHeader className="flex flex-row items-center">
-          <CardDescription className="text-balance text-lg font-bold">
-            <span>{t("Total Users")}:</span>{" "}
-            <span className="font-bold">{data && data.total}</span>
-          </CardDescription>
+          <div className="flex flex-col gap-2">
+            <CardDescription className="text-balance text-lg font-bold">
+              <span>{t("Total Users")}:</span>{" "}
+              <span className="font-bold">{data && data.total}</span>
+            </CardDescription>
+            <div className="flex gap-2">
+              <Badge variant="secondary">
+                <span>Admin:</span>{" "}
+                <span className="ml-1 font-bold">{data?.adminCount || 0}</span>
+              </Badge>
+              <Badge variant="secondary">
+                <span>User:</span>{" "}
+                <span className="ml-1 font-bold">{data?.userCount || 0}</span>
+              </Badge>
+            </div>
+          </div>
           <div className="ml-auto flex items-center justify-end gap-3">
             <Button
               variant={"outline"}

@@ -1,11 +1,12 @@
 import { User, UserRole } from "@prisma/client";
 
+import { hashPassword, verifyPassword } from "@/lib/crypto";
 import { prisma } from "@/lib/db";
 
-import { hashPassword, verifyPassword } from "@/lib/crypto";
-
-export interface UpdateUserForm
-  extends Omit<User, "id" | "createdAt" | "updatedAt" | "emailVerified"> {}
+export interface UpdateUserForm extends Omit<
+  User,
+  "id" | "createdAt" | "updatedAt" | "emailVerified"
+> {}
 
 export const getUserByEmail = async (email: string) => {
   try {
@@ -48,11 +49,16 @@ export const getUserById = async (id: string) => {
       },
     });
 
-    if (user && user.planExpiresAt && user.planExpiresAt < new Date() && user.team !== "free") {
+    if (
+      user &&
+      user.planExpiresAt &&
+      user.planExpiresAt < new Date() &&
+      user.team !== "free"
+    ) {
       // Plan expired, downgrade to free
       await prisma.user.update({
         where: { id },
-        data: { team: "free", planExpiresAt: null }
+        data: { team: "free", planExpiresAt: null },
       });
       user.team = "free";
       user.planExpiresAt = null;
@@ -129,6 +135,18 @@ export async function getAllUsersActiveApiKeyCount() {
     return await prisma.user.count({ where: { apiKey: { not: null } } });
   } catch (error) {
     return -1;
+  }
+}
+
+export async function getUsersByRoleCount() {
+  try {
+    const [adminCount, userCount] = await Promise.all([
+      prisma.user.count({ where: { role: "ADMIN" } }),
+      prisma.user.count({ where: { role: "USER" } }),
+    ]);
+    return { adminCount, userCount };
+  } catch (error) {
+    return { adminCount: 0, userCount: 0 };
   }
 }
 

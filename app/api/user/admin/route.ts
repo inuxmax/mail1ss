@@ -1,4 +1,8 @@
-import { checkUserStatus, getAllUsers } from "@/lib/dto/user";
+import {
+  checkUserStatus,
+  getAllUsers,
+  getUsersByRoleCount,
+} from "@/lib/dto/user";
 import { getCurrentUser } from "@/lib/session";
 
 export async function GET(req: Request) {
@@ -24,7 +28,9 @@ export async function GET(req: Request) {
       userName,
     );
 
-    return Response.json(data);
+    const roleCount = await getUsersByRoleCount();
+
+    return Response.json({ ...data, ...roleCount });
   } catch (error) {
     return Response.json({ statusText: "Server error" }, { status: 500 });
   }
