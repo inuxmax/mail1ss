@@ -2,14 +2,15 @@
 
 import type React from "react";
 import { useState } from "react";
-import useSWR from "swr";
-import { fetcher, nFormatter, cn } from "@/lib/utils";
-import { PlanQuotaFormData } from "@/lib/dto/plan";
-import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/shared/icons";
-import { useToast } from "@/components/ui/use-toast";
-import { X } from "lucide-react";
 import { motion } from "framer-motion";
+import { X } from "lucide-react";
+import useSWR from "swr";
+
+import { PlanQuotaFormData } from "@/lib/dto/plan";
+import { cn, fetcher, nFormatter } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { Icons } from "@/components/shared/icons";
 
 type BenefitType = {
   text: string;
@@ -39,7 +40,6 @@ const getBenefits = (plan: PlanQuotaFormData) => [
     checked: true,
     icon: <Icons.mail className="size-4" />,
   },
-
 
   {
     text: "Advanced analytics",
@@ -75,7 +75,15 @@ const Benefit = ({ text, checked, icon }: BenefitType) => {
   );
 };
 
-const Card = ({ className, children, style = {} }: { className?: string; children: React.ReactNode; style?: any }) => {
+const Card = ({
+  className,
+  children,
+  style = {},
+}: {
+  className?: string;
+  children: React.ReactNode;
+  style?: any;
+}) => {
   return (
     <motion.div
       initial={{
@@ -137,17 +145,35 @@ const PriceCard = ({ tier, price, bestFor, CTA, benefits }: PriceCardProps) => {
 export default function UpgradePage() {
   const { data: plans, isLoading } = useSWR<{ list: PlanQuotaFormData[] }>(
     "/api/plan?all=1",
-    (url) => fetcher(url).then(res => ({
+    (url) =>
+      fetcher(url).then((res) => ({
         ...res,
-        list: res.list.sort((a: any, b: any) => Number(a.price) - Number(b.price))
-    }))
+        list: res.list.sort(
+          (a: any, b: any) => Number(a.price) - Number(b.price),
+        ),
+      })),
   );
   const { toast } = useToast();
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [duration, setDuration] = useState<number>(1);
-  const discounts: Record<number, number> = { 1: 0, 3: 0.05, 6: 0.12, 12: 0.25 };
-  const durationLabels: Record<number, string> = { 1: "1 Month", 3: "3 Months", 6: "6 Months", 12: "12 Months" };
-  const durationBadges: Record<number, string> = { 1: "", 3: "Save 5%", 6: "Save 12%", 12: "Save 25%" };
+  const discounts: Record<number, number> = {
+    1: 0,
+    3: 0.05,
+    6: 0.12,
+    12: 0.25,
+  };
+  const durationLabels: Record<number, string> = {
+    1: "1 Month",
+    3: "3 Months",
+    6: "6 Months",
+    12: "12 Months",
+  };
+  const durationBadges: Record<number, string> = {
+    1: "",
+    3: "Save 5%",
+    6: "Save 12%",
+    12: "Save 25%",
+  };
 
   const handleUpgrade = async (plan: PlanQuotaFormData) => {
     if (!plan.id) return;
@@ -159,7 +185,7 @@ export default function UpgradePage() {
         body: JSON.stringify({ planId: plan.id, duration }),
       });
       const data = await res.json();
-      
+
       if (!res.ok) throw new Error(data.error || "Failed to create invoice");
 
       if (data.url) {
@@ -168,7 +194,8 @@ export default function UpgradePage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Something went wrong",
+        description:
+          error instanceof Error ? error.message : "Something went wrong",
         variant: "destructive",
       });
     } finally {
@@ -181,7 +208,7 @@ export default function UpgradePage() {
   return (
     <div className="container py-10">
       <h1 className="mb-4 text-center text-3xl font-bold">Upgrade Your Plan</h1>
-      
+
       <div className="mb-8 flex justify-center">
         <div className="inline-flex items-center gap-2 rounded-xl border bg-card px-2 py-2 text-card-foreground shadow-sm">
           {[1, 3, 6, 12].map((d) => {
@@ -200,10 +227,14 @@ export default function UpgradePage() {
               >
                 <span>{durationLabels[d]}</span>
                 {badge && (
-                  <span className={cn(
-                    "ml-2 rounded-full px-2 py-0.5 text-[10px]",
-                    active ? "bg-background text-foreground" : "bg-background/70 text-foreground/80"
-                  )}>
+                  <span
+                    className={cn(
+                      "ml-2 rounded-full px-2 py-0.5 text-[10px]",
+                      active
+                        ? "bg-background text-foreground"
+                        : "bg-background/70 text-foreground/80",
+                    )}
+                  >
                     {badge}
                   </span>
                 )}
@@ -215,18 +246,20 @@ export default function UpgradePage() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {plans?.list.map((plan, idx) => {
-          const featured = plan.name.toLowerCase().includes("premium") || idx === 1;
+          const featured =
+            plan.name.toLowerCase().includes("premium") || idx === 1;
           const discount = discounts[duration] || 0;
           const basePrice = Number(plan.price);
-          const total = basePrice > 0 ? (basePrice * duration * (1 - discount)) : 0;
-          const priceText = basePrice > 0 ? `${total.toFixed(2)} USDT` : "Free";
+          const total =
+            basePrice > 0 ? basePrice * duration * (1 - discount) : 0;
+          const priceText = basePrice > 0 ? `${Math.floor(total)} USD` : "Free";
           const bestText = `For ${duration} month${duration > 1 ? "s" : ""}${discount > 0 ? ` • Save ${(discount * 100).toFixed(0)}%` : ""}`;
           return (
             <Card
               key={plan.id}
               className={cn(
                 featured
-                  ? "ring-2 ring-primary shadow-lg bg-gradient-to-br from-primary/5 to-background"
+                  ? "bg-gradient-to-br from-primary/5 to-background shadow-lg ring-2 ring-primary"
                   : "",
               )}
             >
@@ -254,7 +287,12 @@ export default function UpgradePage() {
                 ))}
               </div>
               <Button
-                className={cn("mt-2 w-full", featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : "")}
+                className={cn(
+                  "mt-2 w-full",
+                  featured
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "",
+                )}
                 onClick={() => handleUpgrade(plan)}
                 disabled={loadingPlanId === plan.id || Number(plan.price) <= 0}
                 variant={Number(plan.price) <= 0 ? "outline" : "default"}
@@ -262,7 +300,7 @@ export default function UpgradePage() {
                 {loadingPlanId === plan.id
                   ? "Processing..."
                   : Number(plan.price) > 0
-                    ? "Pay with USDT"
+                    ? "Pay with USD"
                     : "Free Plan"}
               </Button>
             </Card>
